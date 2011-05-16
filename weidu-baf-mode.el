@@ -1,6 +1,4 @@
 
-;make line-indent use (current-indentation) as fixed point, instead of 0
-
 (defvar weidu-baf-mode-hook nil)
 (defvar weidu-baf-mode-map
   (let ((map (make-keymap)))
@@ -56,50 +54,60 @@
 (defun weidu-baf-indent-line (&optional move-point)
   "Indents the current line and optionally moves point to the end of the inserted whitespace."
   (interactive)
-  (let (indented-p indent)
+  (let (indentedp indent indent-from (lines-moved 0))
     (save-excursion
       (beginning-of-line)
+      ;;Indent THEN and END
       (when (or (bobp) (looking-at "^[ \t]*THEN") (looking-at "^[ \t]*END"))
-	(setq indent nil)
-	(setq indented-p t))
-      (while (null indented-p)
+	(setq indent 0)
+	(setq indentedp t))
+      ;;Indent RESPONSE
+      (when (looking-at "^[ \t]*RESPONSE")
+	(setq indent weidu-baf-indent-width)
+	(setq indentedp t))
+      ;;Get the relative indentation offset
+      (save-excursion
+	(while (and (not (looking-at "IF")) (not (bobp)))
+	  (if (looking-at "^[ \t]*IF")
+	      (while (not (looking-at "IF"))
+		(forward-char))
+	      (forward-line -1)))
+	(setq indent-from (current-indentation)))
+      ;;Indent triggers and actions
+      (while (not indentedp)
 	(forward-line -1)
+	(decf lines-moved 1)
 	(cond ((looking-at "^[ \t]*IF")
 	       (progn
 		 (setq indent weidu-baf-indent-width)
-		 (setq indented-p t)))
+		 (setq indentedp t)))
 	      ((bobp)
 	       (progn
-		 (setq indent nil)
-		 (setq indented-p t)))
-	      ((looking-at (concat "^[ \t]*" weidu-baf-triggers)) ;OR should indent another level
+		 (setq indent 0)
+		 (setq indentedp t)))
+	      ((and (looking-at "^[ \t]*OR") (weidu-baf-within-orp lines-moved)) ;write this
 	       (progn
-		 (setq indent weidu-baf-indent-width)
-		 (setq indented-p t)))
+		 (setq indent (* weidu-baf-indent-width 2))
+		 (setq indentedp t)))
 	      ((looking-at "^[ \t]*THEN")
 	       (progn
 		 (setq indent weidu-baf-indent-width)
-		 (setq indented-p t)))
-	      ((looking-at "^[ \t]*RESPONSE") ;Multiple RESPONSEs are not indented correctly; they are indented as per having an action of the line above
+		 (setq indentedp t)))
+	      ((looking-at "^[ \t]*RESPONSE")
 	       (progn
 		 (setq indent (* weidu-baf-indent-width 2))
-		 (setq indented-p t)))
-	      ((looking-at (concat "^[ \t]*" weidu-baf-actions))
-	       (progn
-		 (setq indent (* weidu-baf-indent-width 2))
-		 (setq indented-p t)))
+		 (setq indentedp t)))
 	      ((looking-at "^[ \t]*END")
 	       (progn
-		 (setq indent nil)
-		 (setq indented-p t))))))	   
+		 (setq indent 0)
+		 (setq indentedp t))))))
     (if move-point
-	(if indent
-	    (indent-line-to indent)
-	    (indent-line-to 0))
-	(save-excursion
-	  (if indent
-	      (indent-line-to indent)
-	      (indent-line-to 0))))))
+	(indent-line-to (+ indent indent-from))
+        (save-excursion
+	  (indent-line-to (+ indent indent-from))))))
+
+(defun weidu-baf-within-orp (lines-moved)
+  t)
 
 (defun weidu-baf-indent-block ()
   "Indents the current block, from IF to END."
@@ -114,7 +122,10 @@
 	(while (null done)
 	  (weidu-baf-indent-line)
 	  (forward-line 1)
-	  (when (or (eobp) (looking-at "^[ \t]*END"))
+	  (when (eobp)
+	    (setq done t))
+	  (when (looking-at "^[ \t]*END")
+	    (weidu-baf-indent-line)
 	    (setq done t)))))))
 
 (defun weidu-baf-indent-buffer ()
