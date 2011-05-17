@@ -85,7 +85,7 @@
 	       (progn
 		 (setq indent 0)
 		 (setq indentedp t)))
-	      ((and (looking-at "^[ \t]*OR") (weidu-baf-within-orp lines-moved)) ;write this
+	      ((and (looking-at "^[ \t]*OR") (weidu-baf-within-or-p lines-moved))
 	       (progn
 		 (setq indent (* weidu-baf-indent-width 2))
 		 (setq indentedp t)))
@@ -106,8 +106,23 @@
         (save-excursion
 	  (indent-line-to (+ indent indent-from))))))
 
-(defun weidu-baf-within-orp (lines-moved)
-  t)
+(defun weidu-baf-within-or-p (lines-moved)
+  "lines-moved is expected to be negative"
+  (save-excursion
+    (save-match-data
+      (re-search-forward "OR(\\(.*\\))")
+      (let ((value (match-string 1)))
+	(if (and
+	     (string-match "^[0-9]+$" value)
+	     (integerp (string-to-number value)) 
+	     (>= (+ lines-moved (string-to-number value)) 0))
+	    t
+	    nil)))))
+
+;OR(2)
+;  Foo
+;  Bar
+;Baz
 
 (defun weidu-baf-indent-block ()
   "Indents the current block, from IF to END."
