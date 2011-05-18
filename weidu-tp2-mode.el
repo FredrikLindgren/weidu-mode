@@ -1,9 +1,9 @@
 
 (defvar weidu-tp2-mode-hook nil)
-(defvar weidu-tp2-mode-map
-  (let ((map (make-keymap)))
-    (define-key map (kbd "RET") 'weidu-tp2-indent-newline-indent)
-    map))    
+;(defvar weidu-tp2-mode-map
+;  (let ((map (make-keymap)))
+;    (define-key map (kbd "RET") 'weidu-tp2-indent-newline-indent)
+;    map))    
 
 (add-to-list 'auto-mode-alist '("\\.[Tt][Pp][2AaHhPp]\\'" . weidu-tp2-mode))
 
@@ -19,12 +19,12 @@
 
 ; "!" "<<" ">>" "&&" "||" "&" "|" "`" "=" "!=" ">=" "<=" "^^" "^" "**" "+" "-" "*" "/" ":" "?" "$" ">" "<" "+=" "-=" "*=" "/=" "|=" "&=" "<<=" ">>=" "^^=" "++" "--"
 
-(defconst weidu-tp2-decial-values "\<[0-9]+\>")
-(defconst weidu-tp2-hex-values "\<0[xX][0-9A-Fa-f]+\>")
-(defconst weidu-tp2-octal-values "\<0[oO][0-7]+\>")
-(defconst weidu-tp2-bin-values "\<0[bB][01]+\>")
+(defconst weidu-tp2-decial-values "\\<[0-9]+\\>")
+(defconst weidu-tp2-hex-values "\\<0[xX][0-9A-Fa-f]+\\>")
+(defconst weidu-tp2-octal-values "\\<0[oO][0-7]+\\>")
+(defconst weidu-tp2-bin-values "\\<0[bB][01]+\\>")
 
-(defconst weidu-tp2-wrong-hex-values "\<0[cC][0-9A-Fa-f]+\>")
+(defconst weidu-tp2-wrong-hex-values "\\<0[cC][0-9A-Fa-f]+\\>")
 
 (defconst weidu-tp2-functions (regexp-opt '("fj_are_structure" "FJ_CRE_VALIDITY" "RES_NUM_OF_SPELL_NAME" "RES_NAME_OF_SPELL_NUM" "NAME_NUM_OF_SPELL_RES" "GET_UNIQUE_FILE_NAME" "ADD_AREA_REGION_TRIGGER" "T-CRE_EFF_V1" "FJ_CRE_EFF_V2" "FJ_CRE_REINDEX" "WRITE_SOUNDSET" "READ_SOUNDSET" "SET_CRE_ITEM_FLAGS" "REMOVE_CRE_ITEM_FLAGS" "ADD_CRE_ITEM_FLAGS" "ADD_AREA_ITEM" "REPLACE_AREA_ITEM" "REPLACE_STORE_ITEM" "DELETE_AREA_ITEM" "DELETE_STORE_ITEM" "DELETE_CRE_ITEM" "ADD_CRE_EFFECT" "ADD_ITEM_EQEFFECT" "ADD_ITEM_EFFECT" "ADD_SPELL_EFFECT" "ITEM_EFFECT_TO_SPELL" "DELETE_CRE_EFFECT" "DELETE_ITEM_EQEFFECT" "DELETE_ITEM_EFFECT" "DELETE_SPELL_EFFECT" "tb#fix_file_size" "tb#factorial" "sc#addWmpAre") 'words))
 
@@ -39,13 +39,113 @@
    ;(cons weidu-tp2-hex-values font-lock-variable-name-face)
    ;(cons weidu-tp2-octal-values font-lock-variable-name-face)
    ;(cons weidu-tp2-binary-values font-lock-variable-name-face)
-   (cons weidu-tp2-wrong-hex-values font-lock-warning-face) ;doesn't work
+   (cons weidu-tp2-wrong-hex-values font-lock-warning-face)
    (cons weidu-tp2-functions font-lock-builtin-face)))
 
 (defvar weidu-tp2-font-lock-keywords weidu-tp2-font-lock-keywords-1)
 
 
 (defvar weidu-tp2-indent-width 2)
+
+;If the current line starts with END, find the open BEGIN (also, function calls) and indent to the level of that line
+;If the current line is a when (BUT_ONLY), find the COPY and indent to the level of that line
+;If the current line is one of INT_VAR, STR_VAR, RET and it's below a function, indent to function +1
+;
+;If a line above has an unclosed BEGIN, indent +1
+;If a line above has a WITH, indent +1 (MATCH)
+;If a line above begins with a INT_VAR, STR_VAR or RET, indent +1
+;If a line above is a COPY and I'm a patch, indent +1
+;If a line above is a COPY and I'm an action, indent to indentation of the COPY
+;If all else fails, indent to the first non-trailing whitespace on the line above (0 if there is none)?
+;;Needs a good rewrite
+;(defun weidu-tp2-indent-line (&optional move-point)
+;  (interactive)
+;  (let (indentedp
+;	indent
+;	(when-clauses (concat "^[ \t]*" (regexp-opt '("IF" "UNLESS" "BUT_ONLY" "IF_SIZE_IS" "I_S_I") 'words)))
+;	(fun-keys (concat "^[ \t]*" (regexp-opt '("INT_VAR" "STR_VAR" "RET") 'words))))
+;    (save-excursion
+;      (beginning-of-line)
+;      (when (looking-at when-clauses)
+;	(setq indent (weidu-tp2-get-indentation 'when)) ;write this
+;	(setq indentedp t))
+;      (when (looking-at "^[ \t]*END")
+;	(setq indent (weidu-tp2-get-indentation 'end))
+;	(setq indentedp t))
+;      (when (looking-at fun-keys)
+;	(setq indent (weidu-tp2-get-indentation 'fun-keys))
+;	(setq indentedp t))
+;      )))
+
+(defvar weidu-tp2-end-openings (regexp-opt '("BEGIN" "LAUNCH_ACTION_FUNCTION" "LAUNCH_FUNCTION_ACTION" "LAM" "LAUNCH_PATCH_FUNCTION" "LAUNCH_FUNCTION_PATCH" "LPF" "ACTION_MATCH" "ACTION_TRY" "PATCH_MATCH" "PATCH_TRY" "IF_EXISTING" "ON_DISABLE") 'words))
+
+(defun weidu-tp2-indent-line (&optional move-point)
+  (interactive)
+  (let (indentedp
+	indent)
+    (save-excursion
+      (beginning-of-line)
+      (when (looking-at "^[ \t]*END\\>")
+	(setq indent (weidu-tp2-indent-end))
+	(setq indentedp t))
+      ;(when (looking-at (concat "^[ \t]" when-clauses)) ;write this
+        ;(setq indent (weidu-tp2-indent-when)) ;and this
+	;(setq indentedp t)))
+      )
+    (if move-point
+	(indent-line-to indent)
+        (save-excursion
+	  (indent-line-to indent)))))
+
+(defun weidu-tp2-indent-end ()
+  (save-excursion
+    (let (done
+	  (num-open 0)
+	  (num-close 0))
+      (while (and (not done) (not (bobp))) ;This will misbehave if the first line is indented and relevant
+	(when (looking-at ".*\\<END\\>")
+	  (incf num-close))
+	(when (looking-at (concat ".*" weidu-tp2-end-openings))
+	  (incf num-open))
+	(when (= num-open num-close)
+	  (setq done t)
+	  (while (not (looking-at weidu-tp2-end-openings))
+	    (forward-char)))
+	(unless done
+	  (forward-line -1)))
+      (current-indentation))))
+
+;;This function is bunk. We need something more syntax-aware (hence also specialised).
+;(defun weidu-tp2-get-indentation (arg) ;can probably move these out and send them in as the arg itself - nope, we need a keyword
+;  (let* ((when-paired (regexp-opt '("COPY" "COPY_EXISTING" "COPY_EXISTING_REGEXP" "COPY_RANDOM" "COPY_ALL_GAM_FILES" "APPEND" "APPEND_OUTER" "APPEND_COL" "ADD_SPELL") 'words))
+;	 (when-clause (regexp-opt '("BUT_ONLY" "BUT_ONLY_IF_IT_CHANGES" "IF" "UNLESS" "IF_SIZE_IS" "I_S_I") 'words))
+;	 (end-paired (regexp-opt '("BEGIN" "LAUNCH_ACTION_FUNCTION" "LAUNCH_FUNCTION_ACTION" "LAM" "LAUNCH_PATCH_FUNCTION" "LAUNCH_FUNCTION_PATCH" "LPF" "ACTION_MATCH" "ACTION_TRY" "PATCH_MATCH" "PATCH_TRY" "IF_EXISTING" "ON_DISABLE") 'words))
+;	 (fun-paired (regexp-opt '("LAUNCH_ACTION_FUNCTION" "LAUNCH_FUNCTION_ACTION" "LAM" "LAUNCH_PATCH_FUNCTION" "LAUNCH_FUNCTION_PATCH" "LPF" "DEFINE_ACTION_FUNCTION" "DEFINE_PATCH_FUNCTION") 'words))
+;	 (looking-for (cond ((string-equal arg 'when) when-paired)
+;			    ((string-equal arg 'end) end-paired)
+;			    ((string-equal arg 'fun-keys) fun-paired)))
+;	 done
+;	 (num-open 0)
+;	 (num-close 0))
+;    (save-excursion
+;      (while (not done) ;this doesn't work because when-clauses are optional
+;	(when (and (string-equal arg 'when) (looking-at when-clause))
+;	  (incf num-close))
+;	(when (and (string-equal arg 'when) (looking-at when-paired))
+;	  (incf num-open))
+;	(when (and (string-equal arg 'end) (looking-at "^[ \t]*END"))
+;	  (incf num-close))
+;	(when (and (string-equal arg 'end) (looking-at end-paired))
+;	  (incf num-open))
+;	;(when (and (string-equal arg 'fun-keys) (looking-at 
+;	(when (= num-open num-close)
+;	  (setq done t)
+;	  ;get indentation of the opening line and return it
+;	  (while (not (looking-at "[^ \t]"))
+;	    (forward-char)))
+;	(unless done
+;	  (forward-line -1)))
+;      (current-indentation))))
 
 (defvar weidu-tp2-mode-syntax-table
   (let ((table (make-syntax-table)))
@@ -58,12 +158,12 @@
 (defun weidu-tp2-mode ()
   (interactive)
   (kill-all-local-variables)
-  (use-local-map weidu-tp2-mode-map)
+  ;(use-local-map weidu-tp2-mode-map)
   (set-syntax-table weidu-tp2-mode-syntax-table)
   (set (make-local-variable 'font-lock-defaults) '(weidu-tp2-font-lock-keywords))
-  ;(set (make-local-variable 'indent-line-function) 'weidu-tp2-indent-line)
+  (set (make-local-variable 'indent-line-function) 'weidu-tp2-indent-line)
   (setq mode-name "WeiDU-TP2")
   (run-hooks 'weidu-tp2-mode-hook)
-  (setq major-mode weidu-tp2-mode))
+  (setq major-mode 'weidu-tp2-mode))
 
 (provide 'weidu-tp2-mode)

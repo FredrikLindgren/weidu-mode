@@ -89,13 +89,13 @@
 	       (progn
 		 (setq indent (* weidu-baf-indent-width 2))
 		 (setq indentedp t)))
+	      ((looking-at "^[ \t]*\\(THEN[ \t]+\\)?RESPONSE")
+	       (progn
+		 (setq indent (* weidu-baf-indent-width 2))
+		 (setq indentedp t)))
 	      ((looking-at "^[ \t]*THEN")
 	       (progn
 		 (setq indent weidu-baf-indent-width)
-		 (setq indentedp t)))
-	      ((looking-at "^[ \t]*RESPONSE")
-	       (progn
-		 (setq indent (* weidu-baf-indent-width 2))
 		 (setq indentedp t)))
 	      ((looking-at "^[ \t]*END")
 	       (progn
@@ -177,6 +177,6 @@
   (set (make-local-variable 'indent-line-function) 'weidu-baf-indent-line)
   (setq mode-name "WeiDU-BAF")
   (run-hooks 'weidu-baf-mode-hook)
-  (setq major-mode weidu-baf-mode))
+  (setq major-mode 'weidu-baf-mode))
 
 (provide 'weidu-baf-mode)
