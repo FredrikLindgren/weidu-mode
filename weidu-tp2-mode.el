@@ -1,9 +1,9 @@
 
 (defvar weidu-tp2-mode-hook nil)
-;(defvar weidu-tp2-mode-map
-;  (let ((map (make-keymap)))
-;    (define-key map (kbd "RET") 'weidu-tp2-indent-newline-indent)
-;    map))    
+(defvar weidu-tp2-mode-map
+  (let ((map (make-keymap)))
+    (define-key map (kbd "RET") 'weidu-tp2-indent-newline-indent)
+    map))    
 
 (add-to-list 'auto-mode-alist '("\\.[Tt][Pp][2AaHhPp]\\'" . weidu-tp2-mode))
 
@@ -47,6 +47,12 @@
 
 (defvar weidu-tp2-indent-width 2)
 
+(defvar weidu-tp2-end-openings (regexp-opt '("BEGIN" "LAUNCH_ACTION_FUNCTION" "LAUNCH_FUNCTION_ACTION" "LAM" "LAUNCH_PATCH_FUNCTION" "LAUNCH_FUNCTION_PATCH" "LPF" "ACTION_MATCH" "ACTION_TRY" "PATCH_MATCH" "PATCH_TRY" "IF_EXISTING" "ON_DISABLE") 'words))
+
+(defvar weidu-tp2-when-openings (regexp-opt '("COPY" "COPY_EXISTING" "COPY_EXISTING_REGEXP" "COPY_RANDOM" "COPY_ALL_GAM_FILES" "APPEND" "APPEND_OUTER" "APPEND_COL" "ADD_SPELL") 'words))
+
+(defvar weidu-tp2-when-clauses (regexp-opt '("IF" "UNLESS" "BUT_ONLY" "BUT_ONLY_IF_IT_CHANGES" "IF_SIZE_IS" "I_S_I") 'words))
+
 ;If the current line starts with END, find the open BEGIN (also, function calls) and indent to the level of that line
 ;If the current line is a when (BUT_ONLY), find the COPY and indent to the level of that line
 ;If the current line is one of INT_VAR, STR_VAR, RET and it's below a function, indent to function +1
@@ -57,27 +63,6 @@
 ;If a line above is a COPY and I'm a patch, indent +1
 ;If a line above is a COPY and I'm an action, indent to indentation of the COPY
 ;If all else fails, indent to the first non-trailing whitespace on the line above (0 if there is none)?
-;;Needs a good rewrite
-;(defun weidu-tp2-indent-line (&optional move-point)
-;  (interactive)
-;  (let (indentedp
-;	indent
-;	(when-clauses (concat "^[ \t]*" (regexp-opt '("IF" "UNLESS" "BUT_ONLY" "IF_SIZE_IS" "I_S_I") 'words)))
-;	(fun-keys (concat "^[ \t]*" (regexp-opt '("INT_VAR" "STR_VAR" "RET") 'words))))
-;    (save-excursion
-;      (beginning-of-line)
-;      (when (looking-at when-clauses)
-;	(setq indent (weidu-tp2-get-indentation 'when)) ;write this
-;	(setq indentedp t))
-;      (when (looking-at "^[ \t]*END")
-;	(setq indent (weidu-tp2-get-indentation 'end))
-;	(setq indentedp t))
-;      (when (looking-at fun-keys)
-;	(setq indent (weidu-tp2-get-indentation 'fun-keys))
-;	(setq indentedp t))
-;      )))
-
-(defvar weidu-tp2-end-openings (regexp-opt '("BEGIN" "LAUNCH_ACTION_FUNCTION" "LAUNCH_FUNCTION_ACTION" "LAM" "LAUNCH_PATCH_FUNCTION" "LAUNCH_FUNCTION_PATCH" "LPF" "ACTION_MATCH" "ACTION_TRY" "PATCH_MATCH" "PATCH_TRY" "IF_EXISTING" "ON_DISABLE") 'words))
 
 (defun weidu-tp2-indent-line (&optional move-point)
   (interactive)
@@ -85,24 +70,62 @@
 	indent)
     (save-excursion
       (beginning-of-line)
-      (when (looking-at "^[ \t]*END\\>")
+      (when (looking-at "^[ \t]*\\<END\\>")
 	(setq indent (weidu-tp2-indent-end))
 	(setq indentedp t))
-      ;(when (looking-at (concat "^[ \t]" when-clauses)) ;write this
-        ;(setq indent (weidu-tp2-indent-when)) ;and this
-	;(setq indentedp t)))
-      )
-    (if move-point
-	(indent-line-to indent)
-        (save-excursion
-	  (indent-line-to indent)))))
+      ;(when (looking-at (concat "^[ \t]" weidu-tp2-when-clauses))
+	;(setq indent (weidu-tp2-indent-when)) ;and this
+	;(setq indentedp t))
+      (when (looking-at (concat "^[ \t]*" weidu-tp2-actions))
+	(setq indent (weidu-tp2-unindent-action))
+	(setq indentedp t))
+      (when (looking-at "^[ \t]*\\<\\(INT_VAR\\|STR_VAR\\|RET\\)\\>")
+	(setq indent (weidu-tp2-indent-fun-keywords))
+	(setq indentedp t))
+      (while (and (not indentedp) (not (bobp)))
+	(forward-line -1)
+	(when (looking-at "^[ \t]*[^ \t\n\r]*.*\\<BEGIN\\>")
+	  
+	  ;Do not indent if the BEGIN has been closed
+	  
+	  (while (not (looking-at "[^ \t\n\r]*.*\\<BEGIN\\>"))
+	    (forward-char))
+	  (setq indentedp t)
+	  (setq indent (+ (current-indentation) weidu-tp2-indent-width)))
+	(when (looking-at (concat "^[ \t]*" weidu-tp2-when-openings))
+	  (while (not (looking-at weidu-tp2-when-openings))
+	    (forward-char))
+	  (setq indentedp t)
+	  (setq indent  (+ (current-indentation) weidu-tp2-indent-width)))
+	(when (looking-at "^.*MATCH\\>.*\\<WITH\\>")
+	  (while (not (looking-at "[^ \t\n\r]*MATCH\\>.*\\<WITH\\>"))
+	    (forward-char))
+	  (setq indentedp t)
+	  (setq indent (+ (current-indentation) weidu-tp2-indent-width)))
+	(when (looking-at "^[ \t]*\\<\\(INT_VAR\\|STR_VAR\\|RET\\)\\>")
+	  (while (not (looking-at "\\<\\(INT_VAR\\|STR_VAR\\|RET\\)\\>"))
+	    (forward-char))
+	  (setq indentedp t)
+	  (setq indent (+ (current-indentation) weidu-tp2-indent-width)))
+
+	;indent DEFINE_\\(ACTION\\|PATCH\\)_FUNCTION
+	
+	(when (and (not indentedp) (looking-at "^[ \t]*[^ \t\n\r]")) ;this should probably be in a loop of its own, so it only happens if there are no other indentation clues available (now you can't indent the second line under a clue since it uses the indentation of the first line)
+	  (while (not (looking-at "[^ \t\n\r]"))
+	    (forward-char))
+	  (setq indentedp t)
+	  (setq indent (current-indentation)))))
+    (if move-point ;maybe we should axe this, or default it to t. We can't axe it, but defaulting it to t and reversing the logic in indent-newline-indent could work
+	(indent-line-to (or indent 0))
+      (save-excursion
+	(indent-line-to (or indent 0))))))
 
 (defun weidu-tp2-indent-end ()
   (save-excursion
     (let (done
 	  (num-open 0)
 	  (num-close 0))
-      (while (and (not done) (not (bobp))) ;This will misbehave if the first line is indented and relevant
+      (while (and (not done) (not (bobp))) ;This will misbehave if the first line is indented and relevant (but how often does that happen?)
 	(when (looking-at ".*\\<END\\>")
 	  (incf num-close))
 	(when (looking-at (concat ".*" weidu-tp2-end-openings))
@@ -115,37 +138,66 @@
 	  (forward-line -1)))
       (current-indentation))))
 
-;;This function is bunk. We need something more syntax-aware (hence also specialised).
-;(defun weidu-tp2-get-indentation (arg) ;can probably move these out and send them in as the arg itself - nope, we need a keyword
-;  (let* ((when-paired (regexp-opt '("COPY" "COPY_EXISTING" "COPY_EXISTING_REGEXP" "COPY_RANDOM" "COPY_ALL_GAM_FILES" "APPEND" "APPEND_OUTER" "APPEND_COL" "ADD_SPELL") 'words))
-;	 (when-clause (regexp-opt '("BUT_ONLY" "BUT_ONLY_IF_IT_CHANGES" "IF" "UNLESS" "IF_SIZE_IS" "I_S_I") 'words))
-;	 (end-paired (regexp-opt '("BEGIN" "LAUNCH_ACTION_FUNCTION" "LAUNCH_FUNCTION_ACTION" "LAM" "LAUNCH_PATCH_FUNCTION" "LAUNCH_FUNCTION_PATCH" "LPF" "ACTION_MATCH" "ACTION_TRY" "PATCH_MATCH" "PATCH_TRY" "IF_EXISTING" "ON_DISABLE") 'words))
-;	 (fun-paired (regexp-opt '("LAUNCH_ACTION_FUNCTION" "LAUNCH_FUNCTION_ACTION" "LAM" "LAUNCH_PATCH_FUNCTION" "LAUNCH_FUNCTION_PATCH" "LPF" "DEFINE_ACTION_FUNCTION" "DEFINE_PATCH_FUNCTION") 'words))
-;	 (looking-for (cond ((string-equal arg 'when) when-paired)
-;			    ((string-equal arg 'end) end-paired)
-;			    ((string-equal arg 'fun-keys) fun-paired)))
-;	 done
-;	 (num-open 0)
-;	 (num-close 0))
-;    (save-excursion
-;      (while (not done) ;this doesn't work because when-clauses are optional
-;	(when (and (string-equal arg 'when) (looking-at when-clause))
-;	  (incf num-close))
-;	(when (and (string-equal arg 'when) (looking-at when-paired))
-;	  (incf num-open))
-;	(when (and (string-equal arg 'end) (looking-at "^[ \t]*END"))
-;	  (incf num-close))
-;	(when (and (string-equal arg 'end) (looking-at end-paired))
-;	  (incf num-open))
-;	;(when (and (string-equal arg 'fun-keys) (looking-at 
-;	(when (= num-open num-close)
+(defun weidu-tp2-unindent-action ()
+  (save-excursion
+    (let (done (indent 0))
+      (while (and (not done) (not (bobp)))
+	(when (and (not done) (looking-at ".*\\<INNER_ACTION\\>"))
+	  (setq done t)
+	  (while (not (looking-at "\\<INNER_ACTION\\>"))
+	    (forward-char))
+	  (setq indent weidu-tp2-indent-width))
+	(when (and (not done) (looking-at (concat ".*" weidu-tp2-actions)))
+	  (setq done t)
+	  (while (not (looking-at weidu-tp2-actions))
+	    (forward-char)))
+	(unless done
+	  (forward-line -1)))
+      (+ (current-indentation) indent))))
+
+(defun weidu-tp2-indent-fun-keywords ()
+  (save-excursion
+    (let (done (indent 0))
+      (while (and (not done) (not (bobp)))
+	(forward-line -1)
+	(when (looking-at "^[ \t]*\\<DEFINE_\\(\\(ACTION\\|PATCH\\)_FUNCTION\\|FUNCTION_\\(ACTION\\|PATCH\\)\\)\\>")
+	  (while (not (looking-at "\\<DEFINE_\\(\\(ACTION\\|PATCH\\)_FUNCTION\\|FUNCTION_\\(ACTION\\|PATCH\\)\\)\\>"))
+	    (forward-char))
+	  (setq indent weidu-tp2-indent-width)
+	  (setq done t))
+	(when (looking-at "^[ \t]*\\<\\(INT_VAR\\|STR_VAR\\)\\>")
+	  (while (not (looking-at "\\<\\(INT_VAR\\|STR_VAR\\)\\>"))
+	    (forward-char))
+	  (setq done t)))
+      (+ (current-indentation) indent))))	
+
+;(defun weidu-tp2-indent-when ()
+;  (save-excursion
+;    (let (done
+;	  (indentp t))
+;      (while (and (not done) (not bobp))
+;	
+;	(when (and (looking-at (concat ".*" weidu-tp2-when-openings)) indentp)
 ;	  (setq done t)
-;	  ;get indentation of the opening line and return it
-;	  (while (not (looking-at "[^ \t]"))
+;	  (while (not (looking-at weidu-tp2-when-openings))
 ;	    (forward-char)))
 ;	(unless done
 ;	  (forward-line -1)))
 ;      (current-indentation))))
+
+(defun weidu-tp2-indent-newline-indent ()
+  (interactive)
+  (weidu-tp2-indent-line)
+  (newline)
+  (weidu-tp2-indent-line t))
+
+(defun weidu-tp2-indent-buffer ()
+  (interactive)
+  (save-excursion
+    (beginning-of-buffer)
+    (while (not (eobp))
+      (weidu-tp2-indent-line)
+      (forward-line 1))))
 
 (defvar weidu-tp2-mode-syntax-table
   (let ((table (make-syntax-table)))
@@ -158,7 +210,7 @@
 (defun weidu-tp2-mode ()
   (interactive)
   (kill-all-local-variables)
-  ;(use-local-map weidu-tp2-mode-map)
+  (use-local-map weidu-tp2-mode-map)
   (set-syntax-table weidu-tp2-mode-syntax-table)
   (set (make-local-variable 'font-lock-defaults) '(weidu-tp2-font-lock-keywords))
   (set (make-local-variable 'indent-line-function) 'weidu-tp2-indent-line)
