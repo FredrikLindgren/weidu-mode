@@ -1,4 +1,7 @@
 
+;;;Known issues:
+;;Does not support commenting code with multi-line comments; use single-line comments instead
+
 (defvar weidu-tp2-mode-hook nil)
 (defvar weidu-tp2-mode-map
   (let ((map (make-keymap)))
@@ -11,7 +14,7 @@
 
 (defvar weidu-tp2-keywords (regexp-opt '("BEGIN" "END" "ELSE" "THEN" "PATCH_IF" "PATCH_TRY" "WITH" "PATCH_MATCH" "STR_VAR" "INT_VAR" "RET" "DEFAULT" "EQUIP" "CASE_INSENSITIVE" "CASE_SENSITIVE" "EXACT_MATCH" "EVALUATE_REGEXP" "ACTION_IF" "ACTION_TRY" "ACTION_MATCH" "WHEN" "ANY" "AUTHOR" "BACKUP" "ALWAYS" "LANGUAGE" "VERSION" "README" "AUTO_TRA" "NO_IF_EVAL_BUG" "MENU_STYLE" "ASK_EVERY_COMPONENT" "MODDER" "ALLOW_MISSING" "SCRIPT_STYLE" "UNINSTALL_ORDER" "QUICK_MENU" "ALWAYS_ASK" "SUBCOMPONENT" "SUB_COMPONENT" "FORCED_SUBCOMPONENT" "NO_LOG_RECORD" "DEPRECATED" "DESIGNATED" "REQUIRE_COMPONENT" "INSTALL_BY_DEFAULT" "FORBID_COMPONENT" "REQUIRE_PREDICATE" "GROUP" "LABEL" "USING" "TWOHANDED" "GLOB" "NOGLOB" "IF" "UNLESS" "IF_SIZE_IS" "IF_EVAL" "BUT_ONLY_IF_IT_CHANGES" "I_S_I" "BUT_ONLY" "AFTER" "BEFORE" "LAST" "FIRST" "AT" "EXACT" "NULL" "EVALUATE_BUFFER" "EVAL" "LOAD" "KEEP_CRLF" "IF_EXISTING" "ON_DISABLE" "IN" "AS" "ON_MISMATCH" "INNER_ACTION" "FOR" "WHILE" "OUTER_PATCH" "OUTER_INNER_PATCH" "INNER_PATCH" "OUTER_PATCH_SAVE" "OUTER_INNER_PATCH_SAVE" "INNER_PATCH_SAVE" "OUTER_FOR" "OUTER_WHILE" "PATCH_MATCH" "PATCH_TRY" "ACTION_MATCH" "ACTION_TRY") 'words))
 
-(defvar weidu-tp2-actions (regexp-opt '("VERBOSE" "ADD_MUSIC" "EXTEND_TOP" "ALTER_TLK" "FORBID_FILE" "COPY_EXISTING_REGEXP" "CLEAR_IDS_MAP" "APPEND" "CLEAR_EVERYTHING" "BIFF" "AT_NOW" "EXTEND_BOTTOM_REGEXP" "INCLUDE" "AT_INTERACTIVE_NOW" "ADD_SECTYPE" "EXTEND_BOTTOM" "COPY_KIT" "ADD_SCHOOL" "MKDIR" "ACTION_PHP_EACH" "AT_EXIT" "ALTER_TLK_LIST" "ACTION_FOR_EACH" "DEFINE_PATCH_MACRO" "ADD_KIT" "LAUNCH_ACTION_MACRO" "COPY_EXISTING" "MOVE" "RANDOM_SEED" "ADD_SPELL" "ACTION_CLEAR_ARRAY" "COPY_ALL_GAM_FILES" "WARN" "OUTER_PATCH_SAVE" "OUTER_TEXT_SPRINT" "COPY_LARGE" "PRINT" "ALTER_TLK_RANGE" "REQUIRE_FILE" "GET_FILE_ARRAY" "GET_DIRECTORY_ARRAY" "OUTER_SET" "LAUNCH_ACTION_FUNCTION" "ACTION_DEFINE_ASSOCIATIVE_ARRAY" "DEFINE_PATCH_FUNCTION" "REINCLUDE" "COPY_RANDOM" "ACTION_RERAISE" "AT_UNINSTALL_EXIT" "AT_INTERACTIVE_UNINSTALL_EXIT" "COMPILE" "APPEND_COL" "OUTER_PATCH" "STRING_SET_EVALUATE" "ACTION_READLN" "OUTER_SPRINT" "<<<<<<<<" ">>>>>>>>" "AT_INTERACTIVE_UNINSTALL" "EXTEND_TOP_REGEXP" "CLEAR_MEMORY" "COPY" "CLEAR_INLINED" "LOAD_TRA" "CLEAR_ARRAYS" "ACTION_DEFINE_ARRAY" "AT_UNINSTALL" "ADD_PROJECTILE" "LOG" "CLEAR_CODES" "FAIL" "SILENT" "APPEND_OUTER" "STRING_SET_RANGE" "DISABLE_FROM_KEY" "DECOMPRESS_BIFF" "DEFINE_ACTION_FUNCTION" "STRING_SET" "ADD_AREA_TYPE" "ACTION_BASH_FOR" "AT_INTERACTIVE_EXIT" "UNINSTALL" "DEFINE_ACTION_MACRO" "MAKE_BIFF" "DEFINE_MACRO_ACTION" "DEFINE_MACRO_PATCH" "DEFINE_FUNCTION_PATCH" "DEFINE_FUNCTION_ACTION" "ACTION_INCLUDE" "LAUNCH_MACRO_ACTION" "LAM" "LAUNCH_FUNCTION_ACTION" "LAF" "OUTER_INNER_PATCH" "OUTER_INNER_PATCH_SAVE" "ACTION_REINCLUDE" "OUTER_FOR" "OUTER_WHILE" "ACTION_IF" "ACTION_TRY" "ACTION_MATCH") 'words))
+(defvar weidu-tp2-actions (regexp-opt '("VERBOSE" "ADD_MUSIC" "EXTEND_TOP" "ALTER_TLK" "FORBID_FILE" "COPY_EXISTING_REGEXP" "CLEAR_IDS_MAP" "APPEND" "CLEAR_EVERYTHING" "BIFF" "AT_NOW" "EXTEND_BOTTOM_REGEXP" "INCLUDE" "AT_INTERACTIVE_NOW" "ADD_SECTYPE" "EXTEND_BOTTOM" "COPY_KIT" "ADD_SCHOOL" "MKDIR" "ACTION_PHP_EACH" "AT_EXIT" "ALTER_TLK_LIST" "ACTION_FOR_EACH" "DEFINE_PATCH_MACRO" "ADD_KIT" "LAUNCH_ACTION_MACRO" "COPY_EXISTING" "MOVE" "RANDOM_SEED" "ADD_SPELL" "ACTION_CLEAR_ARRAY" "COPY_ALL_GAM_FILES" "WARN" "OUTER_PATCH_SAVE" "OUTER_TEXT_SPRINT" "COPY_LARGE" "PRINT" "ALTER_TLK_RANGE" "REQUIRE_FILE" "GET_FILE_ARRAY" "GET_DIRECTORY_ARRAY" "OUTER_SET" "LAUNCH_ACTION_FUNCTION" "ACTION_DEFINE_ASSOCIATIVE_ARRAY" "DEFINE_PATCH_FUNCTION" "REINCLUDE" "COPY_RANDOM" "ACTION_RERAISE" "AT_UNINSTALL_EXIT" "AT_INTERACTIVE_UNINSTALL_EXIT" "COMPILE" "APPEND_COL" "OUTER_PATCH" "STRING_SET_EVALUATE" "ACTION_READLN" "OUTER_SPRINT" "AT_INTERACTIVE_UNINSTALL" "EXTEND_TOP_REGEXP" "CLEAR_MEMORY" "COPY" "CLEAR_INLINED" "LOAD_TRA" "CLEAR_ARRAYS" "ACTION_DEFINE_ARRAY" "AT_UNINSTALL" "ADD_PROJECTILE" "LOG" "CLEAR_CODES" "FAIL" "SILENT" "APPEND_OUTER" "STRING_SET_RANGE" "DISABLE_FROM_KEY" "DECOMPRESS_BIFF" "DEFINE_ACTION_FUNCTION" "STRING_SET" "ADD_AREA_TYPE" "ACTION_BASH_FOR" "AT_INTERACTIVE_EXIT" "UNINSTALL" "DEFINE_ACTION_MACRO" "MAKE_BIFF" "DEFINE_MACRO_ACTION" "DEFINE_MACRO_PATCH" "DEFINE_FUNCTION_PATCH" "DEFINE_FUNCTION_ACTION" "ACTION_INCLUDE" "LAUNCH_MACRO_ACTION" "LAM" "LAUNCH_FUNCTION_ACTION" "LAF" "OUTER_INNER_PATCH" "OUTER_INNER_PATCH_SAVE" "ACTION_REINCLUDE" "OUTER_FOR" "OUTER_WHILE" "ACTION_IF" "ACTION_TRY" "ACTION_MATCH") 'words))
 
 (defvar weidu-tp2-constants (regexp-opt '("ITM_V10_HEAD_EFFECTS" "ITM_V10_HEADERS" "ITM_V10_GEN_EFFECTS" "WMP_AREAS" "WMP_LINKS" "AREA_CITY" "AREA_DAY" "AREA_DUNGEON" "AREA_FOREST" "AREA_NIGHT" "ATTACK1" "ATTACK2" "ATTACK3" "ATTACK4" "BATTLE_CRY1" "BATTLE_CRY2" "BATTLE_CRY3" "BATTLE_CRY4" "BATTLE_CRY5" "BIO" "BORED" "COMPLIMENT1" "COMPLIMENT2" "COMPLIMENT3" "CRITICAL_HIT" "CRITICAL_MISS" "DAMAGE" "DESC" "DIALOGUE_DEFAULT" "DIALOGUE_HOSTILE" "DYING" "EXISTANCE1" "EXISTANCE2" "EXISTANCE3" "EXISTANCE4" "EXISTANCE5" "HAPPY" "HURT" "IDENTIFIED_DESC" "INITIAL_MEETING" "INSULT" "INTERACTION1" "INTERACTION2" "INTERACTION3" "INTERACTION4" "INTERACTION5" "INVENTORY_FULL" "LEADER" "MISCELLANEOUS" "MORALE" "NAME1" "NAME2" "PICKED_POCKET" "REACT_TO_DIE_GENERAL" "REACT_TO_DIE_SPECIFIC" "RESPONSE_TO_COMPLIMENT2" "RESPONSE_TO_COMPLIMENT3" "RESPONSE_TO_INSULT1" "RESPONSE_TO_INSULT2" "RESPONSE_TO_INSULT3" "SELECT_ACTION1" "SELECT_ACTION2" "SELECT_ACTION3" "SELECT_ACTION4" "SELECT_ACTION5" "SELECT_ACTION6" "SELECT_ACTION7" "SELECT_COMMON1" "SELECT_COMMON2" "SELECT_COMMON3" "SELECT_COMMON4" "SELECT_COMMON5" "SELECT_COMMON6" "SELECT_RARE1" "SELECT_RARE2" "SPECIAL1" "SPECIAL2" "SPECIAL3" "TARGET_IMMUNE" "TIRED" "UNHAPPY_ANNOYED" "UNHAPPY_BREAKING" "UNHAPPY_SERIOUS" "UNIDENTIFIED_DESC" "HIDDEN_IN_SHADOWS" "SPELL_DISRUPTED" "SET_A_TRAP" "STORE_NAME" "SCRIPT_OVERRIDE" "SCRIPT_CLASS" "SCRIPT_RACE" "SCRIPT_GENERAL" "SCRIPT_DEFAULT" "DEATHVAR" "DIALOG" "AREA_SCRIPT" "WNL" "MNL" "LNL" "TAB" "REGISTRY_BG1_PATH" "REGISTRY_BG2_PATH" "REGISTRY_PST_PATH" "REGISTRY_IWD1_PATH" "REGISTRY_IWD2_PATH" "BIT0" "BIT1" "BIT2" "BIT3" "BIT4" "BIT5" "BIT6" "BIT7" "BIT8" "BIT9" "BIT10" "BIT11" "BIT12" "BIT13" "BIT14" "BIT15" "BIT16" "BIT17" "BIT18" "BIT19" "BIT20" "BIT21" "BIT22" "BIT23" "BIT24" "BIT25" "BIT26" "BIT27" "BIT28" "BIT29" "BIT30" "BIT31") 'words))
 
@@ -66,6 +69,8 @@
 
 ;;Disregard comments (also, consistent treatment of the same)
 
+;;Handle in-lined
+
 
 ;;;END
 ;BEGIN (actions) (Also ELSE BEGIN)
@@ -96,6 +101,12 @@
 	(prin1 "Looking at END")
 	(setq indent 0)
 	(setq indent-from (weidu-tp2-unindent-end))
+	(setq indentedp t))
+       ;;Unindent in-line openings
+       ((looking-at "^[ \t]*<<<<<<<<")
+	(prin1 "Looking-at in-line opening")
+	(setq indent 0)
+	(setq indent-from 0)
 	(setq indentedp t))
        ;;Unindent in-line ends
        ((looking-at "^[ \t]*>>>>>>>>")
@@ -139,11 +150,29 @@
 	(prin1 "Looking at fun keys")
 	(setq indent 0)
 	(setq indent-from (weidu-tp2-indent-fun-keys))
+	(setq indentedp t))
+       ;;Indent strings
+       ((and (looking-at "[ \t]*[A-Za-z0-9!@\"~#%\\-\\_]+") ;Apparently unescaped hyphens and underscores match stuff in emacs-regexp, or something
+	     (not (looking-at (concat "[ \t]*" weidu-tp2-actions ".*")))
+	     (not (looking-at (concat "[ \t]*" weidu-tp2-patches ".*")))
+	     (not (looking-at (concat "[ \t]*" weidu-tp2-keywords ".*")))
+	     (not (looking-at (concat "[ \t]*" weidu-tp2-values ".*"))))
+	(prin1 "Looking at string")
+	(setq indent 0)
+	(setq indent-from (weidu-tp2-indent-to-next-whitespace))
 	(setq indentedp t)))
       ;;Look for indentation clues on the lines above
       (while (and (not indentedp) (not (bobp)))
 	(forward-line -1)
 	(cond
+	 ;;If we find an in-line ending, move past the whole in-lined block
+	 ((looking-at "[ \t]*>>>>>>>>")
+	  (weidu-tp2-move-backwards-past-inline))
+	 ;;If we find an in-line opening, indent to its level
+	 ((looking-at "[ \t]*<<<<<<<<")
+	  (setq indent 0)
+	  (setq indent-from (current-indentation))
+	  (setq indentedp t))
 	 ;;Disregard one-line comments
 	 ((looking-at "^[ \t]*//"))
 	 ;;Increase indentation if we find an unclosed end-opening
@@ -190,12 +219,6 @@
 	  (prin1 "Looking at INT_VAR, STR_VAR, RET")
 	  (setq indent weidu-tp2-indent-width)
 	  (setq indent-from (current-indentation))
-	  (setq indentedp t))
-	 ;;If we find an in-line opening, indent to its level
-	 ((looking-at "[ \t]*<<<<<<<<")
-	  (prin1 "Looking at in-line opening")
-	  (setq indent 0)
-	  (setq indent-from (current-indentation))
 	  (setq indentedp t)))))
     (prin1 indent)
     (prin1 " and ")
@@ -204,6 +227,28 @@
 	(indent-line-to (+ (or indent 0) (or indent-from 0)))
       (save-excursion
 	(indent-line-to (+ (or indent 0) (or indent-from 0)))))))
+
+(defun weidu-tp2-indent-to-next-whitespace ()
+  (save-excursion
+    ;;Move backwards to the first action or patch
+    (while (and (not (bobp)) (not (looking-at (concat "[ \t]*\\(" weidu-tp2-actions "\\|" weidu-tp2-patches "\\|<<<<<<<<\\).*"))))
+      (forward-line -1))
+    ;;Move forward on that line past any leading whitespace and past the first collection of non-whitespace. Lastly, move forward another character (whitespace) to get into alignment
+    (when (looking-at "[ \t]*[^ \t\n\r]+[ \t]+.*")
+      (while (not (looking-at "[^ \t\n\r].*"))
+	(forward-char))
+      (while (looking-at "[^ \t\n\r].*")
+	(forward-char))
+      (forward-char))
+    (current-column)))
+
+(defun weidu-tp2-move-backwards-past-inline ()
+  (while (and (not (bobp)) (not (looking-at "[ \t]*<<<<<<<<")))
+    (forward-line -1)))
+
+(defun weidu-tp2-move-forward-past-inline ()
+  (while (and (not (eobp)) (not (looking-at "[ \t]*>>>>>>>>")))
+    (forward-line)))
 
 (defun weidu-tp2-find-in-line-opening ()
   (save-excursion
@@ -223,7 +268,7 @@
   (save-excursion
     (let (done
 	  (indent 0))
-      (while (and (not done) (not (bobp)))
+      (while (and (not done) (not (bobp)) (not (looking-at "[ \t]<<<<<<<<")))
 	(unless done
 	  (forward-line -1))
 	(when (looking-at "[ \t]*\\(INT\\|STR\\)_VAR\\>.*")
@@ -239,6 +284,9 @@
 	  (open 0)
 	  (closed 0))
       (while (and (not done) (not (bobp)) (not (looking-at "[ \t]*<<<<<<<<")))
+	;;Skip past any in-lined stuff
+	(when (looking-at "[ \t]*>>>>>>>>")
+	  (weidu-tp2-move-backwards-past-inline))
 	(when (or (and (looking-at ".*\\<END\\>.*")
 		       (not (looking-at (concat ".*" weidu-tp2-end-openings ".*"))))
 		  (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
@@ -262,7 +310,10 @@
       ;;If the end-opening is on the same line
       (when (looking-at (concat ".*" weidu-tp2-end-openings ".*" "\\<END\\>.*"))
 	(setq done t))
-      (while (and (not done) (not (looking-at "[ \t]*<<<<<<<<")))
+      (while (not done)
+	;;Skip past any in-lined stuff
+	(when (looking-at "[ \t]*>>>>>>>>")
+	  (weidu-tp2-move-backwards-past-inline))
 	(when (or (and (looking-at ".*\\<END\\>.*")
 		       (not (looking-at (concat ".*" weidu-tp2-end-openings ".*"))))
 		  (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
@@ -285,12 +336,17 @@
 	  (closed 0)
 	  (indent 0)
 	  bobp)
-      (while (and (not done) (not (looking-at "[ \t]*<<<<<<<<")))
+      (while (not done)
 	;;We only want to consider lines above the current line and due to the way forward-line interacts with BoB and EoB, we need to be able to detect if we start at BoB
 	(when (bobp)
 	  (setq bobp t))
 	(forward-line -1)
 	(print "back")
+	;;Skip past any in-lined stuff
+	(when (looking-at "[ \t]*>>>>>>>>")
+	  (weidu-tp2-move-backwards-past-inline))
+	(when (looking-at "[ \t]*<<<<<<<<")
+	  (setq done t))
 	(when (or (and (looking-at ".*\\<END\\>.*")
 		       (not (looking-at (concat ".*" weidu-tp2-end-openings ".*"))))
 		  (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
@@ -306,6 +362,9 @@
 	(when (and (= (- open closed) 1)
 		   (not bobp))
 	  (while (not done)
+	    ;;Skip past any in-lined stuff
+	    (when (looking-at "[ \t]*<<<<<<<<")
+	      (weidu-tp2-move-forward-past-inline))
 	    (when (or (looking-at (concat "^[ \t]*" weidu-tp2-actions ".*"))
 		      (looking-at "[ \t]*INNER_ACTION\\>.*")
 		      (looking-at ".*\\<BEGIN\\>.*"))
@@ -333,6 +392,9 @@
 	  (closed 0)
 	  done)
       (while (and (not done) (not (looking-at "[ \t]*<<<<<<<<")))
+	;;Skip past any in-lined stuff
+	(when (looking-at "[ \t]*>>>>>>>>")
+	  (weidu-tp2-move-backwards-past-inline))
 	(when (or (and (looking-at ".*\\<END\\>.*")
 		       (not (looking-at (concat ".*" weidu-tp2-end-openings ".*"))))
 		  (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
