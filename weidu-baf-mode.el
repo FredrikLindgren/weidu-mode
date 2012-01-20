@@ -6,8 +6,12 @@
     (define-key map (kbd "C-M-q") 'weidu-baf-indent-block)
     map))
 
-(add-to-list 'auto-mode-alist '("\\.[Bb][Aa][Ff]\\'" . weidu-baf-mode))
+;;;maybe these autoloads are pointless, I don't know
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.[Bb][Aa][Ff]\\'" . weidu-baf-mode)) ;when last I tried it would not work with inflix, hence three different
+;;;###autoload
 (add-to-list 'auto-mode-alist (cons "\\.[Ss][Ss][Ll]\\'" 'weidu-baf-mode))
+;;;###autoload
 (add-to-list 'auto-mode-alist (cons "\\.[Ss][Ll][Bb]\\'" 'weidu-baf-mode))
 
 (defvar weidu-baf-triggers (regexp-opt '("Acquired" "AttackedBy" "Help" "Joins" "Leaves" "ReceivedOrder" "Said" "TurnedBy" "Unusable" "Alignment" "Allegiance" "Class" "Exists" "General" "Global" "HP" "HPGT" "HPLT" "LOS" "Morale" "MoraleGT" "MoraleLT" "Race" "Range" "Reputation" "ReputationGT" "ReputationLT" "See" "Specifics" "Time" "TimeOfDay" "HitBy" "HotKey" "TimerExpired" "True" "Trigger" "Die" "TargetUnreachable" "Delay" "NumCreature" "NumCreatureLT" "NumCreatureGT" "ActionListEmpty" "HPPercent" "HPPercentLT" "HPPercentGT" "Heard" "False" "HaveSpell" "HaveAnySpells" "BecameVisible" "GlobalGT" "GlobalLT" "OnCreation" "StateCheck" "NotStateCheck" "NumTimesTalkedTo" "NumTimesTalkedToGT" "NumTimesTalkedToLT" "Reaction" "ReactionGT" "ReactionLT" "GlobalTimerExact" "GlobalTimerExpired" "GlobalTimerNotExpired" "PartyHasItem" "InParty" "CheckStat" "CheckStatGT" "CheckStatLT" "RandomNum" "RandomNumGT" "RandomNumLT" "Died" "Killed" "Entered" "Gender" "PartyGold" "PartyGoldGT" "PartyGoldLT" "Dead" "Opened" "Closed" "Detected" "Reset" "Disarmed" "Unlocked" "OutOfAmmo" "NumTimesInteracted" "NumTimesInteractedGT" "NumTimesInteractedLT" "BreakingPoint" "PickPocketFailed" "StealFailed" "DisarmFailed" "PickLockFailed" "HasItem" "InteractingWith" "InWeaponRange" "HasWeaponEquiped" "Happiness" "HappinessGT" "HappinessLT" "TimeGT" "TimeLT" "NumInParty" "NumInPartyGT" "NumInPartyLT" "UnselectableVariable" "UnselectableVariableGT" "UnselectableVariableLT" "Clicked" "NumberOfTimesTalkedTo" "NumDead" "NumDeadGT" "NumDeadLT" "Detect" "Contains" "OpenState" "NumItems" "NumItemsGT" "NumItemsLT" "NumItemsParty" "NumItemsPartyGT" "NumItemsPartyLT" "IsOverMe" "AreaCheck" "HasItemEquiped" "NumCreatureVsParty" "NumCreatureVsPartyLT" "NumCreatureVsPartyGT" "CombatCounter" "CombatCounterLT" "CombatCounterGT" "AreaType" "TrapTriggered" "PartyMemberDied" "OR" "InPartySlot" "SpellCast" "InLine" "PartyRested" "Level" "LevelGT" "LevelLT" "Summoned" "GlobalsEqual" "GlobalsGT" "GlobalsLT" "LocalsEqual" "LocalsGT" "LocalsLT" "ObjectActionListEmpty" "OnScreen" "InActiveArea" "SpellCastOnMe" "CalanderDay" "CalanderDayGT" "CalanderDayLT" "Name" "SpellCastPriest" "SpellCastInnate" "IsValidForPartyDialog" "IfValidForPartyDialog" "IsValidForPartyDialogue" "IfValidForPartyDialogue" "PartyHasItemIdentified" "HasBounceEffects" "HasImmunityEffects" "HasItemSlot" "PersonalSpaceDistance" "InMyGroup" "RealGlobalTimerExact" "RealGlobalTimerExpired" "RealGlobalTimerNotExpired" "NumInPartyAlive" "NumInPartyAliveGT" "NumInPartyAliveLT" "Kit" "IsGabber" "IsActive" "CharName" "FallenRanger" "FallenPaladin" "InventoryFull" "HasItemEquipedReal" "XP" "XPGT" "XPLT" "G" "GGT" "GLT" "ModalState" "InMyArea" "TookDamage" "DamageTaken" "DamageTakenGT" "DamageTakenLT" "Difficulty" "DifficultyGT" "DifficultyLT" "InPartyAllowDead" "AreaCheckObject" "ActuallyInCombat" "WalkedToTrigger" "LevelParty" "LevelPartyGT" "LevelPartyLT" "HaveSpellParty" "HaveSpellRES" "AmIInWatchersKeepPleaseIgnoreTheLackOfApostophe" "InWatchersKeep") 'words))
@@ -24,36 +28,18 @@
 
 (defvar weidu-baf-font-lock-keywords-1 
   (list
-   (cons weidu-baf-triggers font-lock-builtin-face)
-   (cons weidu-baf-actions font-lock-keyword-face)
-   (cons weidu-baf-keywords font-lock-type-face)
+   (cons weidu-baf-triggers font-lock-function-name-face)
+   (cons weidu-baf-actions font-lock-function-name-face)
+   (cons weidu-baf-keywords font-lock-keyword-face)
    (cons weidu-baf-constants font-lock-constant-face)
-   (cons weidu-baf-objects font-lock-variable-name-face)
-   (cons weidu-baf-ssl font-lock-function-name-face)))
-
-;font-lock-comment-face           -maroon
-;font-lock-comment-delimiter-face -maroon
-;font-lock-doc-face               -beige
-;font-lock-string-face            -beige
-;font-lock-keyword-face           -purple
-;font-lock-builtin-face           -pink
-;font-lock-function-name-face     -blue
-;font-lock-variable-name-face     -yellow
-;font-lock-type-face              -green
-;font-lock-constant-face          -teal
-;font-lock-preprocessor-face      -maroon
-;font-lock-negation-char-face     -black
-;font-lock-warning-face           -red
+   (cons weidu-baf-objects font-lock-type-face)
+   (cons weidu-baf-ssl font-lock-builtin-face)))
 
 (defvar weidu-baf-font-lock-keywords weidu-baf-font-lock-keywords-1)
 
 (defcustom weidu-baf-indent-width 2
   "Width of indentation"
   :type 'integer)
-
-;;;To do:
-
-;;Ignore commented lines in within-or-p
 
 (defun weidu-baf-indent-line (&optional fix-point)
   "Indents the current line and optionally moves point to the end of the inserted whitespace."
@@ -143,7 +129,8 @@
       ;;Look for indentation clues on the lines above
       (while (not indentedp)
 	(forward-line -1)
-	(decf lines-moved)
+	(when (not (looking-at "^[ \t]*//")) ;do not count commented lines (may be a mistake, but it is probably preferable to counting them)
+          (decf lines-moved))
 	;;General-purpose increasing indentation
 	(cond ((looking-at "^[ \t]*\\(IF\\|TRIGGER\\|TARGET\\|BEGIN_ACTION_DEFINITION\\|BEGIN LOOP\\)\\>")
 	       (setq indent weidu-baf-indent-width)
@@ -197,14 +184,15 @@
 (defun weidu-baf-within-or-p (lines-moved)
   "lines-moved is expected to be negative"
   (save-excursion
-    (save-match-data
-      (re-search-forward "OR(\\(.*\\))") ;this could do with a bit more robustness. E.g., it fails on OR(
-      (let ((value (match-string 1)))
-	(if (and
-	     (string-match "^[0-9]+$" value)
-	     (>= (+ lines-moved (string-to-number value)) 0))
-	    t
-	  nil)))))
+    (if (looking-at "^[ \t]*OR([0-9]+)")
+        (save-match-data
+          (re-search-forward "OR(\\(.*\\))")
+          (let ((value (match-string 1)))
+            (if (and (string-match "^[0-9]+$" value)
+                     (>= (+ lines-moved (string-to-number value)) 0))
+                t
+              nil)))
+      nil)))
 
 ;OR(2)
 ;  Foo
@@ -255,6 +243,7 @@
     (modify-syntax-entry ?\n "> b" table)
     table))
 
+;;;###autoload
 (defun weidu-baf-mode ()
   (interactive)
   (kill-all-local-variables)
