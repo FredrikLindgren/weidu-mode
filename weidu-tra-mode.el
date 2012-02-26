@@ -5,9 +5,12 @@
 
 (defvar weidu-tra-traref "@[0-9]+")
 
+(defvar weidu-tra-sndref "\[[a-zA-Z0-9!#_-]+\]")
+
 (defvar weidu-tra-font-lock-keywords-1
   (list
-   (cons weidu-tra-traref font-lock-variable-name-face)))
+   (cons weidu-tra-traref font-lock-variable-name-face)
+   (cons weidu-tra-sndref font-lock-constant-face)))
 
 (defvar weidu-tra-font-lock-keywords weidu-tra-font-lock-keywords-1)
 
@@ -20,6 +23,7 @@
     (modify-syntax-entry ?/ ". 124b" table)
     (modify-syntax-entry ?* ". 23" table)
     (modify-syntax-entry ?\n "> b" table)
+    (modify-syntax-entry ?~ "\"" table)
     table))
 
 ;;;###autoload
