@@ -51,6 +51,8 @@
     (modify-syntax-entry ?/ ". 124b" table)
     (modify-syntax-entry ?* ". 23" table)
     (modify-syntax-entry ?\n "> b" table)
+    (modify-syntax-entry ?~ "$" table)
+    (modify-syntax-entry ?\" "$" table)
     table))
 
 ;;;###autoload

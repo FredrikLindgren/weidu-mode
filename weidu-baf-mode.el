@@ -235,11 +235,11 @@
 (defvar weidu-baf-mode-syntax-table
   (let ((table (make-syntax-table)))
     (modify-syntax-entry ?_ "w" table)
-   ;(modify-syntax-entry ?# "w" table) ;Probably shouldn't have this
-   ;(modify-syntax-entry ?~ "\"\""  table) ;Treat ~ as a string delimiter - is annoying and doesn't work with ~~~~~
     (modify-syntax-entry ?/ ". 124b" table)
     (modify-syntax-entry ?* ". 23" table)
     (modify-syntax-entry ?\n "> b" table)
+    (modify-syntax-entry ?~ "$" table)
+    (modify-syntax-entry ?\" "$" table)
     table))
 
 ;;;###autoload
