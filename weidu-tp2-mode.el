@@ -78,10 +78,6 @@
 
 ;;Handle in-lined
 
-;;Doesn't indent properly after END ELSE BEGIN
-
-;;Doesn't indent END ELSE BEGIN (context: ACTION_IF)
-
 ;;foo = bar (implicit SET) misbehaves due to "looking at string"
 
 ;;DEFINE_(ACTION|PATCH)_FUNCTION foo
@@ -413,19 +409,25 @@
   (save-excursion
     (let ((open 0)
 	  (closed 0)
-	  done)
+	  done
+          line-done)
       (while (and (not done) (not (looking-at "[ \t]*<<<<<<<<")))
 	;;Skip past any in-lined stuff
 	(when (looking-at "[ \t]*>>>>>>>>")
 	  (weidu-tp2-move-backwards-past-inline))
-	(when (or (and (looking-at ".*\\<END\\>.*")
-		       (not (looking-at (concat ".*" weidu-tp2-end-openings ".*"))))
-		  (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
-	  (incf closed))
-	(when (or (and (looking-at (concat ".*" weidu-tp2-end-openings ".*"))
-		       (not (looking-at ".*\\<END\\>.*")))
-		  (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
-	  (incf open))
+	(when (and (or (and (looking-at ".*\\<END\\>.*")
+                            (not (looking-at (concat ".*" weidu-tp2-end-openings ".*"))))
+                       (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
+                   (not line-done))
+	  (incf closed)
+          (setq line-done t))
+	(when (and (or (and (looking-at (concat ".*" weidu-tp2-end-openings ".*"))
+                            (not (looking-at ".*\\<END\\>.*")))
+                       (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
+                   (not line-done))
+	  (incf open)
+          (setq line-done t))
+        (setq line-done nil)
 	(when (= open closed)
 	  (setq done t))
 	(when (bobp)
