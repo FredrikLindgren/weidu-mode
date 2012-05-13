@@ -1,22 +1,16 @@
 
-;;;Redesign:
-;;Have one function for indenting actions and another for indenting patches
-;;The main function does context-sensitive dispatch
-
-;;;Known issues:
-;;Does not support commenting code with multi-line comments; use single-line comments instead
-
-;;no indent-newline-indent; just newline-indent
-
 (defvar weidu-tp2-mode-hook nil)
+(defvar weidu-general-hook nil)
+
 (defvar weidu-tp2-mode-map
   (let ((map (make-keymap)))
-    (define-key map (kbd "RET") 'weidu-tp2-indent-newline-indent)
+    ;;(define-key map (kbd "RET") 'weidu-tp2-indent-newline-indent)
     map))    
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.[Tt][Pp][2AaHhPp]\\'" . weidu-tp2-mode))
 
-(defvar weidu-tp2-patches (regexp-opt '("PATCH_DEFINE_ARRAY" "SET" "INSERT_FILE" "SPRINT" "PATCH_FAIL" "REPLACE" "DESCRIBE_ITEM" "READ_STRREF_S" "PATCH_SILENT" "PATCH_INCLUDE" "APPEND_FILE_EVALUATE" "SPRINTF" "WRITE_ASCII" "READ_STRREF_FS" "REMOVE_MEMORIZED_SPELL" "SAY_EVALUATED" "COMPRESS_INTO_FILE" "SOURCE_BIFF" "PATCH_CLEAR_ARRAY" "REFACTOR_BAF_TRIGGER" "DECOMPILE_AND_PATCH" "REFACTOR_TRIGGER" "TO_LOWER" "WRITE_ASCII_TERMINATED" "DECOMPRESS_REPLACE_FILE" "APPLY_BCS_PATCH_OR_COPY" "REMOVE_CRE_ITEM" "PATCH_GAM" "ADD_MEMORIZED_SPELL" "EDIT_SAV_FILE" "READ_ASCII" "ADD_MAP_NOTE" "DEFINE_ASSOCIATIVE_ARRAY" "EVALUATE_BUFFER_SPECIAL" "PATCH_RANDOM_SEED" "EXTEND_MOS" "REMOVE_CRE_EFFECTS" "PATCH_LOG" "REMOVE_MEMORIZED_SPELLS" "ADD_CRE_ITEM" "READ_SHORT" "REBUILD_CRE_FILE" "READ_SLONG" "COMPRESS_REPLACE_FILE" "COUNT_REGEXP_INSTANCES" "PATCH_VERBOSE" "GET_STRREF_FS" "COMPRESS_INTO_VAR" "READ_BYTE" "PATCH_WARN" "REPLACE_BCS_BLOCK_REGEXP" "READ_STRREF_F" "REMOVE_KNOWN_SPELL" "DECOMPRESS_INTO_VAR" "SPACES" "REPLACE_BCS_BLOCK" "TEXT_SPRINT" "REMOVE_KNOWN_SPELLS" "WRITE_SHORT" "PATCH_RERAISE" "READ_STRREF" "COMPILE_D_TO_DLG" "SNPRINT" "APPEND_FILE" "ADD_STORE_ITEM" "WRITE_LONG" "REPLACE_EVALUATE" "PATCH_PRINT" "READ_SBYTE" "DECOMPRESS_INTO_FILE" "REFACTOR_D_TRIGGER" "REMOVE_STORE_ITEM" "WRITE_BYTE" "GET_STRREF_F" "DELETE_BYTES" "COMPILE_BAF_TO_BCS" "LAUNCH_PATCH_MACRO" "WRITE_FILE" "DECOMPILE_BCS_TO_BAF" "INSERT_BYTES" "PATCH_REINCLUDE" "WRITE_EVALUATED_ASCII" "READ_SSHORT" "REMOVE_CRE_ITEMS" "REPLACE_TEXTUALLY" "ADD_KNOWN_SPELL" "DECOMPILE_DLG_TO_D" "TO_UPPER" "APPLY_BCS_PATCH" "GET_STRREF" "READ_LONG" "PATCH_READLN" "QUOTE" "SAY" "GET_OFFSET_ARRAY" "GET_OFFSET_ARRAY2" "LAUNCH_PATCH_FUNCTION" "REPLACE_CRE_ITEM" "SET_IDS_SYMBOL_OF_INT" "GET_STRREF_S" "A_B_P" "WRITE_ASCII_TERMINATE" "WRITE_ASCIIT" "WRITE_ASCIIE" "WRITE_ASCII_LIST" "WRITE_ASCIIL" "ADD_GAM_NPC" "R_B_B" "R_B_B_RE" "CLEAR_ARRAY" "LOOKUP_IDS_SYMBOL_OF_INT" "DEFINE_ARRAY" "ADD_GAME_NPC" "ADD_GAM_NPC" "PATCH_DEFINE_ASSOCIATIVE_ARRAY" "LOCAL_SET" "LOCAL_SPRINT" "LOCAL_TEXT_SPRINT" "PRETTY_PRINT_2DA" "SET_2DA_ENTRY" "READ_2DA_ENTRY" "READ_2DA_ENTRIES_NOW" "READ_2DA_ENTRY_FORMER" "SET_2DA_ENTRY_LATER" "SET_2DA_ENTRIES_NOW" "INSERT_2DA_ROW" "COUNT_2DA_ROWS" "COUNT_2DA_COLS" "LAUNCH_MACRO_PATCH" "LPM" "LAUNCH_FUNCTION_PATCH" "LPF" "PATCH_IF" "EVALUATE_BUFFER" "EVAL"  "INNER_ACTION" "INNER_PATCH" "PATCH_PHP_EACH" "PATCH_FOR_EACH" "PATCH_BASH_FOR" "INNER_PATCH_SAVE" "INNER_PATCH_FILE" "PHP_EACH" "FOR" "WHILE" "PATCH_TRY" "PATCH_MATCH") 'words))
+(defvar weidu-tp2-patches (regexp-opt '("PATCH_DEFINE_ARRAY" "SET" "INSERT_FILE" "SPRINT" "PATCH_FAIL" "REPLACE" "DESCRIBE_ITEM" "READ_STRREF_S" "PATCH_SILENT" "PATCH_INCLUDE" "APPEND_FILE_EVALUATE" "SPRINTF" "WRITE_ASCII" "READ_STRREF_FS" "REMOVE_MEMORIZED_SPELL" "SAY_EVALUATED" "COMPRESS_INTO_FILE" "SOURCE_BIFF" "PATCH_CLEAR_ARRAY" "REFACTOR_BAF_TRIGGER" "DECOMPILE_AND_PATCH" "REFACTOR_TRIGGER" "TO_LOWER" "WRITE_ASCII_TERMINATED" "DECOMPRESS_REPLACE_FILE" "APPLY_BCS_PATCH_OR_COPY" "REMOVE_CRE_ITEM" "PATCH_GAM" "ADD_MEMORIZED_SPELL" "EDIT_SAV_FILE" "READ_ASCII" "ADD_MAP_NOTE" "DEFINE_ASSOCIATIVE_ARRAY" "EVALUATE_BUFFER_SPECIAL" "PATCH_RANDOM_SEED" "EXTEND_MOS" "REMOVE_CRE_EFFECTS" "PATCH_LOG" "REMOVE_MEMORIZED_SPELLS" "ADD_CRE_ITEM" "READ_SHORT" "REBUILD_CRE_FILE" "READ_SLONG" "COMPRESS_REPLACE_FILE" "COUNT_REGEXP_INSTANCES" "PATCH_VERBOSE" "GET_STRREF_FS" "COMPRESS_INTO_VAR" "READ_BYTE" "PATCH_WARN" "REPLACE_BCS_BLOCK_REGEXP" "READ_STRREF_F" "REMOVE_KNOWN_SPELL" "DECOMPRESS_INTO_VAR" "SPACES" "REPLACE_BCS_BLOCK" "TEXT_SPRINT" "REMOVE_KNOWN_SPELLS" "WRITE_SHORT" "PATCH_RERAISE" "READ_STRREF" "COMPILE_D_TO_DLG" "SNPRINT" "APPEND_FILE" "ADD_STORE_ITEM" "WRITE_LONG" "REPLACE_EVALUATE" "PATCH_PRINT" "READ_SBYTE" "DECOMPRESS_INTO_FILE" "REFACTOR_D_TRIGGER" "REMOVE_STORE_ITEM" "WRITE_BYTE" "GET_STRREF_F" "DELETE_BYTES" "COMPILE_BAF_TO_BCS" "LAUNCH_PATCH_MACRO" "WRITE_FILE" "DECOMPILE_BCS_TO_BAF" "INSERT_BYTES" "PATCH_REINCLUDE" "WRITE_EVALUATED_ASCII" "READ_SSHORT" "REMOVE_CRE_ITEMS" "REPLACE_TEXTUALLY" "ADD_KNOWN_SPELL" "DECOMPILE_DLG_TO_D" "TO_UPPER" "APPLY_BCS_PATCH" "GET_STRREF" "READ_LONG" "PATCH_READLN" "QUOTE" "SAY" "GET_OFFSET_ARRAY" "GET_OFFSET_ARRAY2" "LAUNCH_PATCH_FUNCTION" "REPLACE_CRE_ITEM" "SET_IDS_SYMBOL_OF_INT" "GET_STRREF_S" "A_B_P" "WRITE_ASCII_TERMINATE" "WRITE_ASCIIT" "WRITE_ASCIIE" "WRITE_ASCII_LIST" "WRITE_ASCIIL" "ADD_GAM_NPC" "R_B_B" "R_B_B_RE" "CLEAR_ARRAY" "LOOKUP_IDS_SYMBOL_OF_INT" "DEFINE_ARRAY" "ADD_GAME_NPC" "ADD_GAM_NPC" "PATCH_DEFINE_ASSOCIATIVE_ARRAY" "LOCAL_SET" "LOCAL_SPRINT" "LOCAL_TEXT_SPRINT" "PRETTY_PRINT_2DA" "SET_2DA_ENTRY" "READ_2DA_ENTRY" "READ_2DA_ENTRIES_NOW" "READ_2DA_ENTRY_FORMER" "SET_2DA_ENTRY_LATER" "SET_2DA_ENTRIES_NOW" "INSERT_2DA_ROW" "COUNT_2DA_ROWS" "COUNT_2DA_COLS" "LAUNCH_MACRO_PATCH" "LPM" "LAUNCH_FUNCTION_PATCH" "LPF" "PATCH_IF" "EVALUATE_BUFFER" "EVAL"  "INNER_ACTION" "INNER_PATCH" "PATCH_PHP_EACH" "PATCH_FOR_EACH" "PATCH_BASH_FOR" "INNER_PATCH_SAVE" "INNER_PATCH_FILE" "PHP_EACH" "FOR" "WHILE" "PATCH_TRY" "PATCH_MATCH" "SET_BG2_PROFICIENCY") 'words))
 
 ;;These get their context from the LPMs, LAMs, etc
 (defvar weidu-tp2-builtin-functions (regexp-opt '("fj_are_structure" "FJ_CRE_VALIDITY" "RES_NUM_OF_SPELL_NAME" "RES_NAME_OF_SPELL_NUM" "NAME_NUM_OF_SPELL_RES" "GET_UNIQUE_FILE_NAME" "ADD_AREA_REGION_TRIGGER" "T-CRE_EFF_V1" "FJ_CRE_EFF_V2" "FJ_CRE_REINDEX" "WRITE_SOUNDSET" "READ_SOUNDSET" "SET_CRE_ITEM_FLAGS" "REMOVE_CRE_ITEM_FLAGS" "ADD_CRE_ITEM_FLAGS" "ADD_AREA_ITEM" "REPLACE_AREA_ITEM" "REPLACE_STORE_ITEM" "DELETE_AREA_ITEM" "DELETE_STORE_ITEM" "DELETE_CRE_ITEM" "ADD_CRE_EFFECT" "ADD_ITEM_EQEFFECT" "ADD_ITEM_EFFECT" "ADD_SPELL_EFFECT" "ITEM_EFFECT_TO_SPELL" "DELETE_CRE_EFFECT" "DELETE_ITEM_EQEFFECT" "DELETE_ITEM_EFFECT" "DELETE_SPELL_EFFECT" "tb#fix_file_size" "tb#factorial" "sc#addWmpAre") 'words))
@@ -69,197 +63,35 @@
 
 (defvar weidu-tp2-component-flags (regexp-opt '("DEPRECATED" "REQUIRE_COMPONENT" "FORBID_COMPONENT" "REQUIRE_PREDICATE" "SUBCOMPONENT" "FORCED_SUBCOMPONENT" "GROUP" "INSTALL_BY_DEFAULT" "DESIGNATED" "NO_LOG_RECORD" "LABEL")))
 
+(defvar weidu-tp2-end-inside-string ".*\\(\".*\\<END\\>.*\"\\|~[^~]*\\<END\\>[^~]*~\\|~~~~~.*\\<END\\>.*~~~~~\\)")
 
-;;;To do:
-
-;;Need to avoid indenting inside multi-line strings
-
-;;Disregard comments (also, consistent treatment of the same)
-
-;;Handle in-lined
-
-;;foo = bar (implicit SET) misbehaves due to "looking at string"
-
-;;DEFINE_(ACTION|PATCH)_FUNCTION foo
-;;  INT_VAR
-;;    something = something
-;;  STR_VAR
-;;    something = something
-;;    BEGIN <--WRONG
-;;
-
-;;"looking at string" apparently also interferes with the indentation of function arguments (rr#mdcre in make_fiend, for example)
-
-
-;;Need to be able to indent foo and DEFAULT in
-;(ACTION|PATCH)_MATCH something WITH
-;  foo BEGIN something END
-;  DEFAULT
-;END
-;The problem is that foo is picked up as a string and indented accordingly
-
-;;Need to be able to handle [SET] foo = bar with the implicit SET
-
-;;Unindenting when clauses misbehaves, due to REPLACE_TEXTUALLY ~END~ ~~
-
-;;INCLUDE is apparently not considered an action for indentation purposes (it passes it over and looks for indentation clues above)
-
+(defvar weidu-tp2-debug t)
 
 (defun weidu-tp2-indent-line (&optional fix-point)
   (interactive)
-  (let (indent ;How much?
-	indent-from ;How much (relative)?
-	indentedp ;Are we there yet?
-	(case-fold-search nil) ;Case-sensitive regexps
-	inside-string-p) ;Are we inside a multi-line string?
+  (let ((indent 0) ;how much?
+        indentedp ;are we done yet?
+        (case-fold-search nil)) ;case-sensitive regexps
     (save-excursion
       (beginning-of-line)
       (cond
-       ;;Unindent END
-       ((looking-at "^[ \t]*END\\>.*")
-	(prin1 "Looking at END")
-	(setq indent 0)
-	(setq indent-from (weidu-tp2-unindent-end))
-	(setq indentedp t))
-       ;;Unindent in-line openings
-       ((looking-at "^[ \t]*<<<<<<<<")
-	(prin1 "Looking-at in-line opening")
-	(setq indent 0)
-	(setq indent-from 0)
-	(setq indentedp t))
-       ;;Unindent in-line ends
-       ((looking-at "^[ \t]*>>>>>>>>")
-	(prin1 "Looking at in-line end")
-	(setq indent 0)
-	(setq indent-from (weidu-tp2-find-in-line-opening))
-	(setq indentedp t))
-       ;;Unindent when clauses
-       ((looking-at (concat "^[ \t]*" weidu-tp2-when-clauses))
-	(prin1 "Looking at when clause")
-	(setq indent 0)
-	(setq indent-from (weidu-tp2-unindent-when-clause))
-	(setq indentedp t))
-       ;;Unindent components
-       ((and (looking-at "^[ \t]*\\<BEGIN[ \t]+[\"~#@A-Za-z0-9_-!]+.*")
-	     (not (looking-at (concat ".*\\<BEGIN[ \t]+\\(" weidu-tp2-actions "\\|" weidu-tp2-patches "\\|" weidu-tp2-keywords "\\).*"))))
-	(prin1 "Looking at component start")
-	(setq indent 0)
-	(setq indent-from 0)
-	(setq indentedp t))
-       ;;Unindent component flags
-       ((looking-at (concat "^[ \t]*" weidu-tp2-component-flags ".*"))
-	(prin1 "Looking at component flag")
-	(setq indent 0)
-	(setq indent-from 0)
-	(setq indentedp t))
-       ;;Unindent actions.
-       ((looking-at (concat "^[ \t]*" weidu-tp2-actions ".*"))
-	(prin1 "Looking at action")
-	(setq indent 0)
-	(setq indent-from (weidu-tp2-unindent-action))
-	(setq indentedp t))
-       ;;Unindent COMPILE_*_TO_*
-       ((looking-at "^[ \t]*COMPILE_\\(BAF\\|D\\)_TO_\\(BCS\\|DLG\\)\\>")
-	(prin1 "Looking at COMPILE_*")
-	(setq indent 0)
-	(setq indent-from (weidu-tp2-unindent-compile-baf-d))
-	(setq indentedp t))
-       ;;Unindent function keywords
-       ((looking-at "^[ \t]*\\(\\(INT\\|STR\\)_VAR\\|RET\\)\\>.*")
-	(prin1 "Looking at fun keys")
-	(setq indent 0)
-	(setq indent-from (weidu-tp2-indent-fun-keys))
-	(setq indentedp t))
-       ;;Indent strings
-       ((and (looking-at "[ \t]*[A-Za-z0-9!@\"~#%\\-\\_]+") ;Apparently unescaped hyphens and underscores match stuff in emacs-regexp, or something
-	     (not (looking-at (concat "[ \t]*" weidu-tp2-actions ".*")))
-	     (not (looking-at (concat "[ \t]*" weidu-tp2-patches ".*")))
-	     (not (looking-at (concat "[ \t]*" weidu-tp2-keywords ".*")))
-	     (not (looking-at (concat "[ \t]*" weidu-tp2-values ".*"))))
-	(prin1 "Looking at string")
-	(setq indent 0)
-	(setq indent-from (weidu-tp2-indent-to-next-whitespace))
-	(setq indentedp t)))
-      ;;Look for indentation clues on the lines above
-      (while (and (not indentedp) (not (bobp)))
-	(forward-line -1)
-	(cond
-	 ;;If we find an in-line ending, move past the whole in-lined block
-	 ((looking-at "[ \t]*>>>>>>>>")
-	  (weidu-tp2-move-backwards-past-inline))
-	 ;;If we find an in-line opening, indent to its level
-	 ((looking-at "[ \t]*<<<<<<<<")
-	  (setq indent 0)
-	  (setq indent-from (current-indentation))
-	  (setq indentedp t))
-	 ;;Disregard one-line comments
-	 ((looking-at "^[ \t]*//"))
-	 ;;Increase indentation if we find an unclosed end-opening
-	 ((or (and (looking-at (concat ".*" weidu-tp2-end-openings ".*"))
-		   (not (looking-at ".*\\<END\\>.*")))
-	      (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
-	  (prin1 "Looking at END opening")
-	  (setq indent weidu-tp2-indent-width)
-	  (setq indent-from (current-indentation))
-	  (setq indentedp t))
-	 ;;If we find an END, indent to its level
-	 ((looking-at ".*\\<END\\>.*")
-	  (prin1 "Looking at END")
-	  (setq indent 0)
-	  (setq indent-from (weidu-tp2-find-corresponding-opening))
-	  (setq indentedp t))
-	 ;;If we find a COMPILE_*, indent to its level
-	 ((looking-at "[ \t]*COMPILE_\\(BAF\\|D\\)_TO_\\(BCS\\|DLG\\)\\>")
-	  (prin1 "Looking-at COMPILE_* 2")
-	  (setq indent 0)
-	  (setq indent-from (current-indentation))
-	  (setq indentedp t))
-	 ;;If we find a when clause, indent to its level
-	 ((looking-at (concat ".*" weidu-tp2-when-clauses ".*"))
-	  (prin1 "Looking at when clause 2")
-	  (setq indent 0)
-	  (setq indent-from (current-indentation))
-	  (setq indentedp t))
-	 ;;Increase indentation if we find a COPY
-	 ((and (looking-at (concat "^[ \t]*" weidu-tp2-when-openings ".*"))
-	       (not (looking-at (concat "^[ \t]*" weidu-tp2-when-clauses ".*"))))
-	  (prin1 "Looking at when opening")
-	  (setq indent weidu-tp2-indent-width)
-	  (setq indent-from (current-indentation))
-	  (setq indentedp t))
-	 ;;Increase indentation if we find a DECOMPILE_*_TO_*
-	 ((looking-at "[ \t]*DECOMPILE_\\(BCS\\|DLG\\)_TO_\\(BAF\\|D\\)\\>")
-	  (prin1 "Looking at DECOMPILE_*")
-	  (setq indent weidu-tp2-indent-width)
-	  (setq indent-from (current-indentation))
-	  (setq indentedp t))
-	 ;;Increase indentation if we find one of INT_VAR, STR_VAR or RET
-	 ((looking-at "[ \t]*\\(\\(INT\\|STR\\)_VAR\\|RET\\)")
-	  (prin1 "Looking at INT_VAR, STR_VAR, RET")
-	  (setq indent weidu-tp2-indent-width)
-	  (setq indent-from (current-indentation))
-	  (setq indentedp t)))))
-    (prin1 indent)
-    (prin1 " and ")
-    (prin1 indent-from)
+       ;;;Indent lines where the indentation depends on the content of the current line
+       ;;END
+       ((and (looking-at "^[ \t]*END\\>")
+             (not (looking-at weidu-tp2-end-inside-string))
+             (not (looking-at ".*\\<END[\"~]"))) ;hackish; not looking at e.g., END~, which is probably the most common case of END-inside-string where both string delimiters are not on the same line (a situation in which the first END-inside-string will not match)
+        (when weidu-tp2-debug (print "Looking at END"))
+        (setq indentedp t)
+        (incf indent (weidu-tp2-indent-end)))
+       ;;next
+       )
+      )
     (if (not fix-point)
-	(indent-line-to (+ (or indent 0) (or indent-from 0)))
+        (indent-line-to indent)
       (save-excursion
-	(indent-line-to (+ (or indent 0) (or indent-from 0)))))))
-
-(defun weidu-tp2-indent-to-next-whitespace ()
-  (save-excursion
-    ;;Move backwards to the first action or patch
-    (while (and (not (bobp)) (not (looking-at (concat "[ \t]*\\(" weidu-tp2-actions "\\|" weidu-tp2-patches "\\|<<<<<<<<\\).*"))))
-      (forward-line -1))
-    ;;Move forward on that line past any leading whitespace and past the first collection of non-whitespace. Lastly, move forward another character (whitespace) to get into alignment
-    (when (looking-at "[ \t]*[^ \t\n\r]+[ \t]+.*")
-      (while (not (looking-at "[^ \t\n\r].*"))
-	(forward-char))
-      (while (looking-at "[^ \t\n\r].*")
-	(forward-char))
-      (forward-char))
-    (current-column)))
+        (indent-line-to indent)))
+    )
+  )
 
 (defun weidu-tp2-move-backwards-past-inline ()
   (while (and (not (bobp)) (not (looking-at "[ \t]*<<<<<<<<")))
@@ -276,135 +108,7 @@
       (forward-line -1))
     (current-indentation)))
 
-(defun weidu-tp2-unindent-compile-baf-d ()
-  (save-excursion
-    (while (and (not (looking-at "[ \t]*DECOMPILE_\\(BCS\\|DLG\\)_TO_\\(BAF\\|D\\)\\>"))
-		(not (bobp)))
-      (forward-line -1))
-    (current-indentation)))
-
-(defun weidu-tp2-indent-fun-keys ()
-  (save-excursion
-    (let (done
-	  (indent 0))
-      (while (and (not done) (not (bobp)) (not (looking-at "[ \t]<<<<<<<<")))
-	(unless done
-	  (forward-line -1))
-	(when (looking-at "[ \t]*\\(INT\\|STR\\)_VAR\\>.*")
-	  (setq done t))
-	(when (looking-at (concat ".*" weidu-tp2-function-indent-cue ".*"))
-	  (setq done t)
-	  (setq indent weidu-tp2-indent-width)))
-      (+ (current-indentation) indent))))
-
-(defun weidu-tp2-unindent-when-clause ()
-  (save-excursion
-    (let (done
-	  (open 0)
-	  (closed 0))
-      (while (and (not done) (not (bobp)) (not (looking-at "[ \t]*<<<<<<<<")))
-	;;Skip past any in-lined stuff
-	(when (looking-at "[ \t]*>>>>>>>>")
-	  (weidu-tp2-move-backwards-past-inline))
-	(when (or (and (looking-at ".*\\<END\\>.*")
-		       (not (looking-at (concat ".*" weidu-tp2-end-openings ".*"))))
-		  (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
-	  (incf closed))
-	(when (or (and (looking-at (concat ".*" weidu-tp2-end-openings ".*"))
-		       (not (looking-at ".*\\<END\\>.*")))
-		  (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
-	  (incf open))
-	(when (and (= open closed)
-		   (looking-at (concat ".*" weidu-tp2-when-openings ".*")))
-	  (setq done t))
-	(unless done
-	  (forward-line -1)))
-      (current-indentation))))
-
-(defun weidu-tp2-find-corresponding-opening ()
-  (save-excursion
-    (let (done
-	  (open 0)
-	  (closed 0))
-      ;;If the end-opening is on the same line
-      (when (looking-at (concat ".*" weidu-tp2-end-openings ".*" "\\<END\\>.*"))
-	(setq done t))
-      (while (not done)
-	;;Skip past any in-lined stuff
-	(when (looking-at "[ \t]*>>>>>>>>")
-	  (weidu-tp2-move-backwards-past-inline))
-	(when (or (and (looking-at ".*\\<END\\>.*")
-		       (not (looking-at (concat ".*" weidu-tp2-end-openings ".*"))))
-		  (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
-	  (incf closed))
-	(when (or (and (looking-at (concat ".*" weidu-tp2-end-openings ".*"))
-		       (not (looking-at ".*\\<END\\>.*")))
-		  (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
-	  (incf open))
-	(when (or (= open closed) (bobp))
-	  (setq done t))
-	(unless done
-	  (forward-line -1)))
-      (current-indentation))))
-
-(defun weidu-tp2-unindent-action ()
-  "Returns the indentation of the first action after the line where end-openings and ENDs are balanced. If the action has an unclosed end-opening, add a level of indentation."
-  (save-excursion
-    (let (done
-	  (open 0)
-	  (closed 0)
-	  (indent 0)
-	  bobp)
-      (while (not done)
-	;;We only want to consider lines above the current line and due to the way forward-line interacts with BoB and EoB, we need to be able to detect if we start at BoB
-	(when (bobp)
-	  (setq bobp t))
-	(forward-line -1)
-	(print "back")
-	;;Skip past any in-lined stuff
-	(when (looking-at "[ \t]*>>>>>>>>")
-	  (weidu-tp2-move-backwards-past-inline))
-	(when (looking-at "[ \t]*<<<<<<<<")
-	  (setq done t))
-	(when (or (and (looking-at ".*\\<END\\>.*")
-		       (not (looking-at (concat ".*" weidu-tp2-end-openings ".*"))))
-		  (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
-	  (incf closed))
-	(when (or (and (looking-at (concat ".*" weidu-tp2-end-openings ".*"))
-		       (not (looking-at ".*\\<END\\>.*")))
-		  (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
-	  (incf open))
-	;;If we find an unnested action, indent to its level
-	(when (and (= open closed)
-		   (looking-at (concat "^[ \t]*" weidu-tp2-actions ".*")))
-	  (setq done t))
-	(when (and (= (- open closed) 1)
-		   (not bobp))
-	  (while (not done)
-	    ;;Skip past any in-lined stuff
-	    (when (looking-at "[ \t]*<<<<<<<<")
-	      (weidu-tp2-move-forward-past-inline))
-	    (when (or (looking-at (concat "^[ \t]*" weidu-tp2-actions ".*"))
-		      (looking-at "[ \t]*INNER_ACTION\\>.*")
-		      (looking-at ".*\\<BEGIN\\>.*"))
-	      (if (or (and (looking-at (concat ".*" weidu-tp2-end-openings ".*"))
-			   (not (looking-at ".*\\<END\\>.*")))
-		      (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
-		  (progn
-		    (setq done t)
-		    (setq indent weidu-tp2-indent-width))
-		(setq done t)))
-	    (when (or (bobp) (eobp))
-	      (setq done t))
-	    (unless done
-	      (forward-line 1)
-	      (print "forward")
-	      )))
-	(when (bobp)
-	  (setq done t)))
-      (+ (current-indentation) indent))))
-
-(defun weidu-tp2-unindent-end ()
+(defun weidu-tp2-indent-end ()
   "Returns the indentation of the end-opening where the number of end-openings and ENDs are balanced."
   (save-excursion
     (let ((open 0)
@@ -415,13 +119,15 @@
 	;;Skip past any in-lined stuff
 	(when (looking-at "[ \t]*>>>>>>>>")
 	  (weidu-tp2-move-backwards-past-inline))
-	(when (and (or (and (looking-at ".*\\<END\\>.*")
-                            (not (looking-at (concat ".*" weidu-tp2-end-openings ".*"))))
+	(when (and (or (and (looking-at ".*\\<END\\>")
+                            (not (looking-at weidu-tp2-end-inside-string))
+                            (not (looking-at ".*\\<END[\"~]"))
+                            (not (looking-at (concat ".*" weidu-tp2-end-openings ".*\\<END\\>")))) ;this is to filter out BEGIN foo END and such
                        (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
                    (not line-done))
 	  (incf closed)
           (setq line-done t))
-	(when (and (or (and (looking-at (concat ".*" weidu-tp2-end-openings ".*"))
+	(when (and (or (and (looking-at (concat ".*" weidu-tp2-end-openings ".*")) ;make sure this is alright
                             (not (looking-at ".*\\<END\\>.*")))
                        (looking-at ".*\\<END[ \t]+ELSE[ \t]+BEGIN\\>.*"))
                    (not line-done))
@@ -434,7 +140,7 @@
 	  (setq done t))
 	(unless done
 	  (forward-line -1)
-	  (print "back")))
+	  (when weidu-tp2-debug (print "back"))))
       (current-indentation))))
 
 (defun weidu-tp2-indent-newline-indent ()
@@ -468,9 +174,9 @@
   (use-local-map weidu-tp2-mode-map)
   (set-syntax-table weidu-tp2-mode-syntax-table)
   (set (make-local-variable 'font-lock-defaults) '(weidu-tp2-font-lock-keywords))
-  (set (make-local-variable 'indent-line-function) 'weidu-tp2-indent-line)
+  ;;(set (make-local-variable 'indent-line-function) 'weidu-tp2-indent-line)
   (setq mode-name "WeiDU-TP2")
-  (run-hooks 'weidu-tp2-mode-hook)
+  (run-hooks 'weidu-general-hook 'weidu-tp2-mode-hook)
   (setq major-mode 'weidu-tp2-mode))
 
 (provide 'weidu-tp2-mode)

@@ -1,13 +1,10 @@
 
-;;;to do:
-;; - look into having triggers and actions only being highlighted when they look like foo(.*), to avoid things like the loose word "True" being highlighted even when it is not the trigger True()
-;; - maybe highlight the RESPONSE weights
-
 (defcustom weidu-baf-indent-width 2
   "Width of indentation"
   :type 'integer)
 
 (defvar weidu-baf-mode-hook nil)
+(defvar weidu-general-hook nil)
 
 (defvar weidu-baf-mode-map
   (let ((map (make-keymap)))
@@ -15,7 +12,6 @@
     (define-key map (kbd "C-M-q") 'weidu-baf-indent-block)
     map))
 
-;;;maybe these autoloads are pointless, I don't know
 ;;;###autoload
 (add-to-list 'auto-mode-alist (cons "\\.[Bb][Aa][Ff]\\'" 'weidu-baf-mode)) ;when last I tried it would not work with inflix, hence three different
 ;;;###autoload
@@ -31,8 +27,9 @@
 
 (defvar weidu-baf-font-lock-keywords-1 
   (list
-   (cons weidu-bg-triggers font-lock-function-name-face)
-   (cons weidu-bg-actions font-lock-function-name-face)
+   ;;weidu-bg-triggers and weidu-bg-actions are set up to only match the trigger/action part of "foo(", to avoid font lock of any old "foo"
+   (cons weidu-bg-triggers (list 1 font-lock-function-name-face))
+   (cons weidu-bg-actions (list 1 font-lock-function-name-face))
    (cons weidu-bg-constants font-lock-constant-face)
    (cons weidu-bg-objects font-lock-type-face)
    (cons weidu-baf-keywords font-lock-keyword-face)
@@ -193,10 +190,10 @@
               nil)))
       nil)))
 
-;OR(2)
-;  Foo
-;  Bar
-;Baz
+;;OR(2)
+;;  Foo
+;;  Bar
+;;Baz
 
 (defun weidu-baf-indent-block ()
   "Indents the current block, from IF to END."
@@ -251,7 +248,7 @@
   (set (make-local-variable 'font-lock-defaults) '(weidu-baf-font-lock-keywords))
   (set (make-local-variable 'indent-line-function) 'weidu-baf-indent-line)
   (setq mode-name "WeiDU-BAF")
-  (run-hooks 'weidu-baf-mode-hook)
+  (run-hooks 'weidu-general-hook 'weidu-baf-mode-hook)
   (setq major-mode 'weidu-baf-mode))
 
 (provide 'weidu-baf-mode)

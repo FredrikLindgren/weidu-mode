@@ -1,6 +1,8 @@
 
 (defvar weidu-tra-mode-hook nil)
+(defvar weidu-general-hook nil)
 
+;;;###autoload
 (add-to-list 'auto-mode-alist (cons "\\.[tT][rR][aA]\\'" 'weidu-tra-mode))
 
 (defvar weidu-tra-traref "@[0-9]+")
@@ -35,7 +37,7 @@
   (set-syntax-table weidu-tra-mode-syntax-table)
   (set (make-local-variable 'font-lock-defaults) '(weidu-tra-font-lock-keywords))
   (setq mode-name "WeiDU-TRA")
-  (run-hooks 'weidu-tra-mode-hook)
+  (run-hooks 'weidu-general-hook 'weidu-tra-mode-hook)
   (setq major-mode 'weidu-tra-mode))
 
 (provide 'weidu-tra-mode)
