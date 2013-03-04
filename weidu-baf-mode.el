@@ -3,6 +3,10 @@
   "Width of indentation"
   :type 'integer)
 
+(defcustom weidu-baf-debug nil
+  "Boolean for debug prints"
+  :type 'boolean)
+
 (defvar weidu-baf-mode-hook nil)
 (defvar weidu-general-hook nil)
 
@@ -25,7 +29,7 @@
 
 (defvar weidu-baf-keywords (regexp-opt '("IF" "THEN" "RESPONSE" "END" "TRIGGER" "TARGET" "INCLUDE FILE" "BEGIN LOOP" "END LOOP" "DO" "VARIABLE" "BEGIN_ACTION_DEFINITION" "ACTION") 'words))
 
-(defvar weidu-baf-font-lock-keywords-1 
+(defvar weidu-baf-font-lock-keywords-1
   (list
    ;;weidu-bg-triggers and weidu-bg-actions are set up to only match the trigger/action part of "foo(", to avoid font lock of any old "foo"
    (cons weidu-bg-triggers (list 1 font-lock-function-name-face))
@@ -45,8 +49,13 @@
 	indent-from			;How much (base-line)
 	(lines-moved 0)			;For keeping track of ORs
 	(case-fold-search nil))		;Case-sensitive regexps
-    (save-excursion
+    (save-excursion ;we shoud probably also save match data
       (beginning-of-line)
+      ;;No indentation for empty lines
+      (when (looking-at "^[ \t]*$")
+        (setq indent 0)
+        (setq indent-from 0)
+        (setq indentedp t))
       ;;Indent END LOOP
       (when (looking-at "^[ \t]*END LOOP\\>")
 	(setq indent 0)
@@ -72,7 +81,7 @@
       ;;Indent TARGET (found in SLBs)
       (when (looking-at "^[ \t]*TARGET\\>")
 	(save-excursion
-	  (while (and (not (looking-at "^[ \t]*\\(TRIGGER\\|TARGET\\)\\>")) (not (bop)))
+	  (while (and (not (looking-at "^[ \t]*\\(TRIGGER\\|TARGET\\)\\>")) (not (bop))) ;is (bop) correct?
 	    (forward-line -1))
 	  (setq indent 0)
 	  (setq indent-from (current-indentation))
@@ -121,7 +130,7 @@
       ;;Keep opening statements from being indented if they are on the first line
       (when (and (bobp) (looking-at "^[ \t]*\\(IF\\|BEGIN_ACTION_DEFINITION\\|TRIGGER\\|TARGET\\|BEGIN LOOP\\|THEN\\|ACTION\\)\\>"))
 	(setq indentedp t)
-	(setq indent (current-indentation)))
+	(setq indent-from (current-indentation)))
       ;;Look for indentation clues on the lines above
       (while (not indentedp)
 	(forward-line -1)
@@ -247,6 +256,7 @@
   (set-syntax-table weidu-baf-mode-syntax-table)
   (set (make-local-variable 'font-lock-defaults) '(weidu-baf-font-lock-keywords))
   (set (make-local-variable 'indent-line-function) 'weidu-baf-indent-line)
+  (set (make-local-variable 'eldoc-documentation-function) 'weidu-eldoc-function)
   (setq mode-name "WeiDU-BAF")
   (run-hooks 'weidu-general-hook 'weidu-baf-mode-hook)
   (setq major-mode 'weidu-baf-mode))

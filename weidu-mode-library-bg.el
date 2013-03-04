@@ -7,4 +7,44 @@
 
 (defvar weidu-bg-objects (regexp-opt '("Nothing" "Myself" "LeaderOf" "GroupOf" "WeakestOf" "StrongestOf" "MostDamagedOf" "LeastDamagedOf" "ProtectedBy" "ProtectorOf" "LastAttackerOf" "LastTargetedBy" "NearestEnemyOf" "LastCommandedBy" "Nearest" "LastHitter" "LastHelp" "LastTrigger" "LastSeenBy" "LastTalkedToBy" "LastHeardBy" "Player1" "Player2" "Player3" "Player4" "Player5" "Player6" "Protagonist" "StrongestOfMale" "SecondNearestEnemyOf" "ThirdNearestEnemyOf" "FourthNearestEnemyOf" "FifthNearestEnemyOf" "SixthNearestEnemyOf" "SeventhNearestEnemyOf" "EighthNearestEnemyOf" "NinthNearestEnemyOf" "TenthNearestEnemyOf" "SecondNearest" "ThirdNearest" "FourthNearest" "FifthNearest" "SixthNearest" "SeventhNearest" "EighthNearest" "NinthNearest" "TenthNearest" "WorstAC" "BestAC" "LastSummonerOf" "NearestEnemyOfType" "SecondNearestEnemyOfType" "ThirdNearestEnemyOfType" "FourthNearestEnemyOfType" "FifthNearestEnemyOfType" "SixthNearestEnemyOfType" "SeventhNearestEnemyOfType" "EigthNearestEnemyOfType" "NinthNearestEnemyOfType" "TenthNearestEnemyOfType" "NearestMyGroupOfType" "SecondNearestMyGroupOfType" "ThirdNearestMyGroupOfType" "FourthNearestMyGroupOfType" "FifthNearestMyGroupOfType" "SixthNearestMyGroupOfType" "SeventhNearestMyGroupOfType" "EigthNearestMyGroupOfType" "NinthNearestMyGroupOfType" "TenthNearestMyGroupOfType" "Player1Fill" "Player2Fill" "Player3Fill" "Player4Fill" "Player5Fill" "Player6Fill" "NearestDoor" "SecondNearestDoor" "ThirdNearestDoor" "FourthNearestDoor" "FifthNearestDoor" "SixthNearestDoor" "SeventhNearestDoor" "EighthNearestDoor" "NinthNearestDoor" "TenthNearestDoor" "scstarget") 'words))
 
+(defvar weidu-bg-eldoc-obarray (make-vector 1 0))
+
+(set (intern "AttackReevaluate" weidu-bg-eldoc-obarray)
+     "AttackReevaluate(O:Target*,I:ReevaluationPeriod*)")
+
+(defun weidu-eldoc-at-point ()
+  "Returns a doc string appropriate for the current context, or nil."
+  (symbol-value (intern-soft (thing-at-point 'symbol)
+                                 weidu-bg-eldoc-obarray)))
+
+(defun weidu-open-function-p (stop-here)
+  "Will move forward until end of line and return true if there is an unclosed lparen. It is assumed the lparen will be among the characters processed. stop-here"
+  (save-excursion
+    (let ((l 0)
+          (r 0)
+          donep)
+      (while (not donep)
+        (when (looking-at "(")
+          (incf l))
+        (when (looking-at ")")
+          (incf r))
+        (when (or (looking-at "[\n\r]") (eobp) (= (point) stop-here))
+          (setq donep t))
+        (forward-char))
+      (if (> l r)
+          t
+        nil))))
+
+;;make sure this works with nested functions (ActionOverride)
+;;make it display when point is over the lparen or in the function name; currently it only displays if we are to the right of the lparen
+
+(defun weidu-eldoc-function ()
+  (save-excursion
+    (save-match-data
+      (let ((stop-here (- (point) 1)))
+        (re-search-backward "\\([A-Za-z]+(\\|[\n\r]\\)")
+        (if (weidu-open-function-p stop-here)
+            (weidu-eldoc-at-point)
+          nil)))))
+
 (provide 'weidu-mode-library-bg)

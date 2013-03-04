@@ -5,7 +5,7 @@
 ;;;###autoload
 (add-to-list 'auto-mode-alist (cons "\\.[tT][rR][aA]\\'" 'weidu-tra-mode))
 
-(defvar weidu-tra-traref "@[0-9]+")
+(defvar weidu-tra-traref "@-?[0-9]+")
 
 (defvar weidu-tra-sndref "\[[a-zA-Z0-9!#_-]+\]")
 
