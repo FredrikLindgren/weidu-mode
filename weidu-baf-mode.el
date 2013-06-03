@@ -27,16 +27,16 @@
 
 (defvar weidu-baf-ssl (regexp-opt '("RequireBlock" "IgnoreBlock" "TargetBlock" "Target" "TriggerBlock" "Action" "ConditionalTargetBlock" "Combine" "ActionCondition" "OnContinue") 'words))
 
-(defvar weidu-baf-keywords (regexp-opt '("IF" "THEN" "RESPONSE" "END" "TRIGGER" "TARGET" "INCLUDE FILE" "BEGIN LOOP" "END LOOP" "DO" "VARIABLE" "BEGIN_ACTION_DEFINITION" "ACTION") 'words))
+(defvar weidu-baf-keywords (regexp-opt '("IF" "THEN" "RESPONSE" "END" "TRIGGER" "TARGET" "INCLUDE FILE" "BEGIN LOOP" "END LOOP" "DO" "VARIABLE" "BEGIN_ACTION_DEFINITION" "ACTION" "DEFAULT TRIGGER") 'words))
 
 (defvar weidu-baf-font-lock-keywords-1
   (list
    ;;weidu-bg-triggers and weidu-bg-actions are set up to only match the trigger/action part of "foo(", to avoid font lock of any old "foo"
+   (cons weidu-baf-keywords font-lock-keyword-face) ;this needs to go before constants, or DEFAULT TRIGGER is font-locked in two differet colours
    (cons weidu-bg-triggers (list 1 font-lock-function-name-face))
    (cons weidu-bg-actions (list 1 font-lock-function-name-face))
    (cons weidu-bg-constants font-lock-constant-face)
    (cons weidu-bg-objects font-lock-type-face)
-   (cons weidu-baf-keywords font-lock-keyword-face)
    (cons weidu-baf-ssl font-lock-builtin-face)))
 
 (defvar weidu-baf-font-lock-keywords weidu-baf-font-lock-keywords-1)
@@ -81,7 +81,7 @@
       ;;Indent TARGET (found in SLBs)
       (when (looking-at "^[ \t]*TARGET\\>")
 	(save-excursion
-	  (while (and (not (looking-at "^[ \t]*\\(TRIGGER\\|TARGET\\)\\>")) (not (bop))) ;is (bop) correct?
+	  (while (and (not (looking-at "^[ \t]*\\(TRIGGER\\|TARGET\\)\\>")) (not (bobp)))
 	    (forward-line -1))
 	  (setq indent 0)
 	  (setq indent-from (current-indentation))
