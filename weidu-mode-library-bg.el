@@ -72,6 +72,7 @@
                       `(weidu-set-eldoc-element ,x))
                     weidu-bg-eldoc-fodder)))
 
+;;this expands into (progn (set ...) ...)
 (weidu-set-eldoc)
 
 (defun weidu-eldoc-at-point ()
