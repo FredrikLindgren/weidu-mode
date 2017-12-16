@@ -51,7 +51,8 @@
 
 (defcustom weidu-tp2-indent-width 2
   "Width of indentation"
-  :type 'integer)
+  :type 'integer
+  :group 'style)
 
 (defvar weidu-tp2-end-openings (regexp-opt '("BEGIN" "ALWAYS" "ALWAYS_ASK" "QUICK_MENU" "IF_EXISTING" "ON_DISABLE" "ACTION_MATCH" "PATCH_MATCH" "ACTION_TRY" "PATCH_TRY" "LAUNCH_ACTION_FUNCTION" "LAUNCH_FUNCTION_ACTION" "LAF" "LAUNCH_PATCH_FUNCTION" "LAUNCH_FUNCTION_PATCH" "LPF" "ON_MISMATCH") 'words))
 
@@ -152,7 +153,7 @@
 (defun weidu-tp2-indent-buffer ()
   (interactive)
   (save-excursion
-    (beginning-of-buffer)
+    (goto-char (point-min))
     (while (not (eobp))
       (weidu-tp2-indent-line)
       (forward-line 1))))
